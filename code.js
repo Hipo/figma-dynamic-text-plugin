@@ -34,22 +34,22 @@ function collectTextNodeInfo(selection) {
                 };
                 if (node.fontName.family) {
                     textNodes.push(node_data);
+                    if (fontNamesByUsage.hasOwnProperty(node_data.fontName)) {
+                        // increase count
+                        fontNamesByUsage[node_data.fontName] += 1;
+                    }
+                    else {
+                        fontNamesByUsage[node_data.fontName] = 1;
+                    }
+                    if (availableFontWeights.indexOf(node_data.fontWeight) < 0) {
+                        availableFontWeights.push(node_data.fontWeight);
+                    }
+                    if (availableFontSizes.indexOf(node_data.fontSize) < 0) {
+                        availableFontSizes.push(node_data.fontSize);
+                    }
                 }
                 else {
                     textNodesWithoutFontFamily.push(node_data);
-                }
-                if (fontNamesByUsage.hasOwnProperty(node_data.fontName)) {
-                    // increase count
-                    fontNamesByUsage[node_data.fontName] += 1;
-                }
-                else {
-                    fontNamesByUsage[node_data.fontName] = 1;
-                }
-                if (availableFontWeights.indexOf(node_data.fontWeight) < 0) {
-                    availableFontWeights.push(node_data.fontWeight);
-                }
-                if (availableFontSizes.indexOf(node_data.fontSize) < 0) {
-                    availableFontSizes.push(node_data.fontSize);
                 }
             }
         }
