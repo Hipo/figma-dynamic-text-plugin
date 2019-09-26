@@ -61,6 +61,29 @@ function collectTextNodeInfo(selection) {
     }
     selection.forEach(item => childrenIterator(item));
 }
+function createNewStyle(textNodes) {
+    if (textNodes.length > 0) {
+        console.log(figma.getNodeById(textNodes[0].id));
+        let textNode = figma.getNodeById(textNodes[0].id);
+        let textNodeFont = textNode.fontName;
+        figma.loadFontAsync({ family: textNodeFont.family, style: textNodeFont.style }).then(value1 => {
+            let newTextStyle = figma.createTextStyle();
+            newTextStyle.name = "undefined";
+            newTextStyle.fontName = textNodeFont;
+            newTextStyle.fontSize = textNode.fontSize;
+            textNodes.forEach(value => {
+                let textNode = figma.getNodeById(value.id);
+                textNode.textStyleId = newTextStyle.id;
+            });
+        });
+    }
+}
+function assignToStyle(textNodes, textStyleId) {
+    textNodes.forEach(value => {
+        let textNode = figma.getNodeById(value);
+        textNode.textStyleId = textStyleId;
+    });
+}
 function InitUI() {
     collectTextNodeInfo(figma.root.children);
     figma.ui.postMessage({
@@ -76,7 +99,13 @@ function InitUI() {
 figma.showUI(__html__);
 InitUI();
 figma.ui.onmessage = msg => {
-    if (msg.type === 'initUIRequest') {
-        InitUI();
+    if (msg.type === 'create-new-style') {
+        let textNodeList = msg.filteredTextNodes;
+        createNewStyle(textNodeList);
+    }
+    if (msg.type === 'assign-to-selected-style') {
+        let textNodeList = msg.filteredTextNodes;
+        let textStyleId = msg.textStyleId;
+        assignToStyle(textNodeList, textStyleId);
     }
 };
