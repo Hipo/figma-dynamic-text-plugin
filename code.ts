@@ -25,7 +25,7 @@ function collectTextNodeInfo(selection) {
 			childrenIterator(child)
 		})
 		} else {
-			if (node.type === 'TEXT') {
+			if (node.type === 'TEXT' && node.fontName.family ) {
 			    let node_data = {
                     "id": node.id,
                     "characters": node.characters,
