@@ -88,7 +88,7 @@
         </div>
         <div class="right-align">
             <button id="run_script" class="button" onclick="onRunScriptClick()">Run Script</button>
-            <select id="style_spinner" class="style-custom-select" hidden="hidden"></select>
+            <select id="style-spinner" class="style-custom-select" hidden="hidden"></select>
         </div>
     </div>
 </div>
@@ -101,6 +101,7 @@
     var availableFontNames = [];
     var availableFontWeights = [];
     var availableFontSizes = [];
+    var availableTextStyles = [];
 
     function filterTextNodes(fontName, fontWeight, fontSize) {
         var usageList = document.getElementById("usage-list");
@@ -141,7 +142,7 @@
     function onRunScriptClick() {
         document.getElementById("run_script").hidden = true;
         document.getElementById("usage-text").hidden = false;
-        document.getElementById("style_spinner").hidden = false;
+        document.getElementById("style-spinner").hidden = false;
         getSelectedFontsAndSendToFilter()
     }
 
@@ -164,36 +165,44 @@
             fontNamesByUsage = msg.fontNamesByUsage;
             availableFontWeights = msg.availableFontWeights;
             availableFontSizes = msg.availableFontSizes;
+            availableTextStyles = msg.availableTextStyles;
 
             console.log(fontNamesByUsage);
             console.log(availableFontWeights);
             console.log(availableFontSizes);
+            console.log(availableTextStyles);
 
             Object.keys(fontNamesByUsage).forEach(element => {
                 if (element != null) {
-                    var option = document.createElement("option");
-                    option.text = element + " " + fontNamesByUsage[element];
-                    option.value = element;
-                    document.getElementById('font-options').appendChild(option);
+                    var text = element + " " + fontNamesByUsage[element];
+                    createOptionAndAddToSelector(text, element, 'font-options')
                 }
             });
 
             availableFontWeights.forEach(element => {
                 if (element != null) {
-                    var option = document.createElement("option");
-                    option.text = element;
-                    option.value = element;
-                    document.getElementById('font-weights').appendChild(option);
+                    createOptionAndAddToSelector(element, element, 'font-weights');
                 }
             });
             availableFontSizes.forEach(element => {
                 if (element != null) {
-                    var option = document.createElement("option");
-                    option.text = element;
-                    option.value = element;
-                    document.getElementById('font-sizes').appendChild(option);
+                    createOptionAndAddToSelector(element, element, 'font-sizes');
                 }
             });
+
+            createOptionAndAddToSelector("+ Create New", "create-new", 'style-spinner');
+            availableTextStyles.forEach(element => {
+                if( element != null){
+                    createOptionAndAddToSelector(element.name, element.id, 'style-spinner');
+                }
+            })
+        }
+
+        function createOptionAndAddToSelector(text, value, selectorName) {
+            var option = document.createElement("option");
+            option.text = text;
+            option.value = value;
+            document.getElementById(selectorName).appendChild(option);
         }
     }
 </script>
