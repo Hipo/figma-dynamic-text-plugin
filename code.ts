@@ -65,7 +65,6 @@ function collectTextNodeInfo(selection) {
 
 		}
 	}
-
 	selection.forEach(item => childrenIterator(item))
 }
 
@@ -82,7 +81,7 @@ function InitUI() {
     });
 }
 
-figma.showUI(__html__);
+figma.showUI(__html__, { width: 484, height: 600 });
 
 InitUI();
 

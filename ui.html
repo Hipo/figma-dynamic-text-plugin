@@ -1,4 +1,14 @@
 <style type="text/css">
+
+    .font-custom-select {
+        width: 468px;
+        height: 40px;
+        margin-bottom:10px;
+        border: 1px solid #D7D7D7;
+        border-radius: 0;
+        background: #ffffff;
+    }
+
     .container {
         display: flex;
         flex-flow: row wrap;
@@ -24,11 +34,9 @@
     }
 </style>
 
-<p> Font <select id="font-options"></select></p>
-
-<p> Weight <select id="font-weights"></select></p>
-
-<p> Size <select id="font-sizes"></select></p>
+<select id="font-options" class="font-custom-select"></select>
+<select id="font-weights"  class="font-custom-select"></select>
+<select id="font-sizes"  class="font-custom-select"></select>
 
 <button id="run_script" class="button">Run Script</button>
 
