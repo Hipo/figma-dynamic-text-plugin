@@ -3,12 +3,12 @@
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (see documentation).
-let availableTextStyles = [];
-let textNodesWithoutFontFamily = [];
-let textNodes = [];
-let fontNamesByUsage = {};
-let availableFontWeights = [];
-let availableFontSizes = [];
+var availableTextStyles = [];
+var textNodesWithoutFontFamily = [];
+var textNodes = [];
+var fontNamesByUsage = {};
+var availableFontWeights = [];
+var availableFontSizes = [];
 function collectTextNodeInfo(selection) {
     // Runs through all the node element in the document and
     // fills global variables, textNodes, availableFontNames, availableFontWeights, availableFontSizes
@@ -24,13 +24,13 @@ function collectTextNodeInfo(selection) {
     });
     function childrenIterator(node) {
         if (node.children) {
-            node.children.forEach(child => {
+            node.children.forEach(function (child) {
                 childrenIterator(child);
             });
         }
         else {
             if (node.type === 'TEXT') {
-                let node_data = {
+                var node_data = {
                     "id": node.id,
                     "characters": node.characters,
                     "fontName": node.fontName.family,
@@ -59,28 +59,28 @@ function collectTextNodeInfo(selection) {
             }
         }
     }
-    selection.forEach(item => childrenIterator(item));
+    selection.forEach(function (item) { return childrenIterator(item); });
 }
 function createNewStyle(textNodes) {
     if (textNodes.length > 0) {
         console.log(figma.getNodeById(textNodes[0].id));
-        let textNode = figma.getNodeById(textNodes[0].id);
-        let textNodeFont = textNode.fontName;
-        figma.loadFontAsync({ family: textNodeFont.family, style: textNodeFont.style }).then(value1 => {
-            let newTextStyle = figma.createTextStyle();
+        var textNode_1 = figma.getNodeById(textNodes[0].id);
+        var textNodeFont_1 = textNode_1.fontName;
+        figma.loadFontAsync({ family: textNodeFont_1.family, style: textNodeFont_1.style }).then(function (value1) {
+            var newTextStyle = figma.createTextStyle();
             newTextStyle.name = "undefined";
-            newTextStyle.fontName = textNodeFont;
-            newTextStyle.fontSize = textNode.fontSize;
-            textNodes.forEach(value => {
-                let textNode = figma.getNodeById(value.id);
+            newTextStyle.fontName = textNodeFont_1;
+            newTextStyle.fontSize = textNode_1.fontSize;
+            textNodes.forEach(function (value) {
+                var textNode = figma.getNodeById(value.id);
                 textNode.textStyleId = newTextStyle.id;
             });
         });
     }
 }
 function assignToStyle(textNodes, textStyleId) {
-    textNodes.forEach(value => {
-        let textNode = figma.getNodeById(value);
+    textNodes.forEach(function (value) {
+        var textNode = figma.getNodeById(value);
         textNode.textStyleId = textStyleId;
     });
 }
@@ -98,14 +98,18 @@ function InitUI() {
 }
 figma.showUI(__html__, { width: 484, height: 600 });
 InitUI();
-figma.ui.onmessage = msg => {
+figma.ui.onmessage = function (msg) {
     if (msg.type === 'create-new-style') {
-        let textNodeList = msg.filteredTextNodes;
+        var textNodeList = msg.filteredTextNodes;
         createNewStyle(textNodeList);
     }
     if (msg.type === 'assign-to-selected-style') {
-        let textNodeList = msg.filteredTextNodes;
-        let textStyleId = msg.textStyleId;
+        var textNodeList = msg.filteredTextNodes;
+        var textStyleId = msg.textStyleId;
         assignToStyle(textNodeList, textStyleId);
+    }
+    if (msg.type === 'focus-on-selected-node') {
+        var selectedNode = [figma.getNodeById(msg.selectedNodeId)];
+        figma.viewport.scrollAndZoomIntoView(selectedNode);
     }
 };

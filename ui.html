@@ -30,16 +30,30 @@
         height: 10px;
         overflow-y: scroll;
     }
+
+    hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #E1E1E1;
+        margin: 1em 0;
+        padding: 0;
+    }
+
+    .usage-text {
+        color: #20C17E;
+        font-weight: bold;
+    }
 </style>
 
-<select id="font-options" class="font-custom-select"></select>
-<select id="font-weights" class="font-custom-select"></select>
-<select id="font-sizes" class="font-custom-select"></select>
+<select id="font-options" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
+<select id="font-weights" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
+<select id="font-sizes" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
 
-<button id="run_script" class="button">Run Script</button>
-
-<p id="usage-text"></p>
-
+<hr/>
+<button id="run_script" class="button" onclick="onRunScriptClick()">Run Script</button>
+<p id="usage-text" hidden="hidden" class="usage-text"></p>
+<hr/>
 <ul id="usage-list">
 </ul>
 
@@ -69,11 +83,21 @@
             return true;
         });
         document.getElementById("usage-text").innerHTML = filteredTextNodes.length + " Usage";
-        parent.postMessage({ pluginMessage: { type: 'create-new-style', filteredTextNodes } }, '*')
+        // parent.postMessage({ pluginMessage: { type: 'create-new-style', filteredTextNodes } }, '*')
         console.log(filteredTextNodes);
     }
 
-    document.getElementById('run_script').addEventListener('click', function () {
+    function onTextNodeClick(selectedNodeId) {
+        parent.postMessage({pluginMessage: {type: 'focus-on-selected-node', selectedNodeId} }, '*' )
+    }
+
+    function onRunScriptClick() {
+        document.getElementById("run_script").hidden = true;
+        document.getElementById("usage-text").hidden = false;
+        getSelectedFontsAndSendToFilter()
+    }
+
+    function getSelectedFontsAndSendToFilter() {
         var selectFonts = document.getElementById("font-options");
         var selectedFont = selectFonts.options[selectFonts.selectedIndex].value;
         var selectFontWeights = document.getElementById("font-weights");
@@ -81,7 +105,7 @@
         var selectSizes = document.getElementById("font-sizes");
         var selectedSize = selectSizes.options[selectSizes.selectedIndex].value;
         filterTextNodes(selectedFont, selectedFontWeight, selectedSize)
-    })
+    }
 
     onmessage = (e) => {
         var msg = event.data.pluginMessage;

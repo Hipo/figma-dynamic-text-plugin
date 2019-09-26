@@ -125,4 +125,9 @@ figma.ui.onmessage = msg => {
         let textStyleId = msg.textStyleId;
         assignToStyle(textNodeList, textStyleId)
     }
+
+    if (msg.type === 'focus-on-selected-node'){
+        let selectedNode = [figma.getNodeById(msg.selectedNodeId)];
+        figma.viewport.scrollAndZoomIntoView(selectedNode)
+    }
 };
