@@ -1,8 +1,49 @@
-<h2>Font Master</h2>
+<style type="text/css">
+    .container {
+        display: flex;
+        flex-flow: row wrap;
+    }
+
+    .footer {
+        display: none;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: white;
+    }
+
+    .button {
+        background-color: #20C17E;
+        border: none;
+        color: white;
+        padding: 15px 25px;
+        text-align: center;
+        font-size: 14px;
+        cursor: pointer;
+    }
+</style>
+
+<p> Font <select id="font-options"></select></p>
+
+<p> Weight <select id="font-weights"></select></p>
+
+<p> Size <select id="font-sizes"></select></p>
+
+<button id="run_script" class="button">Run Script</button>
+
+<div id="result-filter">
+
+</div>
+
 <script>
     var textNodes = [];
+    var availableFontNames = [];
+    var availableFontWeights = [];
+    var availableFontSizes = [];
+
     function filterTextNodes(fontName, fontWeight, fontSize) {
-        return textNodes.filter(function (node) {
+        var filteredTextNodes = textNodes.filter(function (node) {
             if (fontName && node.fontName != fontName) {
                 return false;
             }
@@ -14,14 +55,63 @@
             }
             return true;
         });
+        var usageParagraph = document.createElement("p");
+        var usageText = document.createTextNode(filteredTextNodes.length + " Usage");
+        usageParagraph.appendChild(usageText)
+        document.getElementById("result-filter").appendChild(usageParagraph);
+        console.log(filteredTextNodes);
     }
 
-	onmessage = (e) => {
-		var msg = event.data.pluginMessage;
+    document.getElementById('run_script').addEventListener('click', function () {
+        var selectFonts = document.getElementById("font-options");
+        var selectedFont = selectFonts.options[selectFonts.selectedIndex].value;
+        var selectFontWeights = document.getElementById("font-weights");
+        var selectedFontWeight = selectFontWeights.options[selectFontWeights.selectedIndex].value;
+        var selectSizes = document.getElementById("font-sizes");
+        var selectedSize = selectSizes.options[selectSizes.selectedIndex].value;
+        filterTextNodes(selectedFont, selectedFontWeight, selectedSize)
+    })
+
+    onmessage = (e) => {
+        var msg = event.data.pluginMessage;
+        console.log(msg);
+
         if (msg.type == "initUI") {
             textNodes = msg.textNodes;
-            // init ui here.
-            console.log(msg);
+            fontNamesByUsage = msg.fontNamesByUsage;
+            availableFontWeights = msg.availableFontWeights;
+            availableFontSizes = msg.availableFontSizes;
+
+            console.log(fontNamesByUsage);
+            console.log(availableFontWeights);
+            console.log(availableFontSizes);
+
+
+            Object.keys(fontNamesByUsage).forEach(element => {
+                if (element != null) {
+                    var option = document.createElement("option");
+                    option.text = element + " " + fontNamesByUsage[element];
+                    option.value = element;
+                    document.getElementById('font-options').appendChild(option);
+                }
+            });
+
+            availableFontWeights.forEach(element => {
+                if (element != null) {
+                    var option = document.createElement("option");
+                    option.text = element;
+                    option.value = element;
+                    document.getElementById('font-weights').appendChild(option);
+                }
+            });
+            availableFontSizes.forEach(element => {
+                if (element != null) {
+                    var option = document.createElement("option");
+                    option.text = element;
+                    option.value = element;
+                    document.getElementById('font-sizes').appendChild(option);
+                }
+            });
         }
-	}
+    }
 </script>
