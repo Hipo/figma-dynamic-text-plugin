@@ -1,0 +1,27 @@
+<h2>Font Master</h2>
+<script>
+    var textNodes = [];
+    function filterTextNodes(fontName, fontWeight, fontSize) {
+        return textNodes.filter(function (node) {
+            if (fontName && node.fontName != fontName) {
+                return false;
+            }
+            if (fontWeight && node.fontWeight != fontWeight) {
+                return false;
+            }
+            if (fontSize && node.fontSize != fontSize) {
+                return false;
+            }
+            return true;
+        });
+    }
+
+	onmessage = (e) => {
+		var msg = event.data.pluginMessage;
+        if (msg.type == "initUI") {
+            textNodes = msg.textNodes;
+            // init ui here.
+            console.log(msg);
+        }
+	}
+</script>
