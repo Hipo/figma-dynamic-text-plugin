@@ -8,6 +8,15 @@
         background: #ffffff;
     }
 
+    .style-custom-select {
+        width: 140px;
+        height: 40px;
+        margin-bottom: 10px;
+        border: 1px solid #D7D7D7;
+        border-radius: 0;
+        background: #ffffff;
+    }
+
     .container {
         display: flex;
         flex-flow: row wrap;
@@ -48,6 +57,23 @@
         color: #20C17E;
         font-weight: bold;
     }
+
+
+    .table {
+        display:table;
+        width:100%;
+    }
+    .table-row {
+        display:table-row;
+    }
+    .left-align {
+        display:table-cell;
+        width:25%;
+    }
+    .right-align {
+        display:table-cell;
+        text-align:right;
+    }
 </style>
 
 <select id="font-options" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
@@ -55,8 +81,17 @@
 <select id="font-sizes" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
 
 <hr/>
-<button id="run_script" class="button" onclick="onRunScriptClick()">Run Script</button>
-<p id="usage-text" hidden="hidden" class="usage-text"></p>
+<div class="table">
+    <div class="table-row">
+        <div class="left-align">
+            <p id="usage-text" hidden="hidden" class="usage-text"></p>
+        </div>
+        <div class="right-align">
+            <button id="run_script" class="button" onclick="onRunScriptClick()">Run Script</button>
+            <select id="style_spinner" class="style-custom-select" hidden="hidden"></select>
+        </div>
+    </div>
+</div>
 <hr/>
 <ul id="usage-list">
 </ul>
@@ -106,6 +141,7 @@
     function onRunScriptClick() {
         document.getElementById("run_script").hidden = true;
         document.getElementById("usage-text").hidden = false;
+        document.getElementById("style_spinner").hidden = false;
         getSelectedFontsAndSendToFilter()
     }
 
