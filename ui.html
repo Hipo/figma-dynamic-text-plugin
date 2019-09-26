@@ -54,6 +54,7 @@
             return true;
         });
         document.getElementById("usage-text").innerHTML = filteredTextNodes.length + " Usage";
+        parent.postMessage({ pluginMessage: { type: 'create-new-style', filteredTextNodes } }, '*')
         console.log(filteredTextNodes);
     }
 
@@ -80,7 +81,6 @@
             console.log(fontNamesByUsage);
             console.log(availableFontWeights);
             console.log(availableFontSizes);
-
 
             Object.keys(fontNamesByUsage).forEach(element => {
                 if (element != null) {
