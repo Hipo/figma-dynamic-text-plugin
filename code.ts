@@ -18,7 +18,12 @@ function collectTextNodeInfo(selection) {
     fontNamesByUsage = {};
     availableFontWeights = [];
     availableFontSizes = [];
-    availableTextStyles = figma.getLocalTextStyles();
+    figma.getLocalTextStyles().forEach(function(style){
+        availableTextStyles.push({
+            id: style.id,
+            name: style.name
+        });
+    });
 
 	function childrenIterator(node) {
 		if (node.children) {
