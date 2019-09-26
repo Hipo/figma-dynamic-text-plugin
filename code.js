@@ -5,14 +5,14 @@
 // full browser environment (see documentation).
 let availableTextStyles = [];
 let textNodes = [];
-let availableFontNames = [];
+let fontNamesByUsage = {};
 let availableFontWeights = [];
 let availableFontSizes = [];
 function collectTextNodeInfo(selection) {
     // Runs through all the node element in the document and
     // fills global variables, textNodes, availableFontNames, availableFontWeights, availableFontSizes
     textNodes = [];
-    availableFontNames = [];
+    fontNamesByUsage = {};
     availableFontWeights = [];
     availableFontSizes = [];
     availableTextStyles = figma.getLocalTextStyles();
@@ -32,8 +32,12 @@ function collectTextNodeInfo(selection) {
                     "fontSize": node.fontSize
                 };
                 textNodes.push(node_data);
-                if (availableFontNames.indexOf(node_data.fontName) < 0) {
-                    availableFontNames.push(node_data.fontName);
+                if (fontNamesByUsage.hasOwnProperty(node_data.fontName)) {
+                    // increase count
+                    fontNamesByUsage[node_data.fontName] += 1;
+                }
+                else {
+                    fontNamesByUsage[node_data.fontName] = 1;
                 }
                 if (availableFontWeights.indexOf(node_data.fontWeight) < 0) {
                     availableFontWeights.push(node_data.fontWeight);
@@ -51,7 +55,7 @@ function InitUI() {
     figma.ui.postMessage({
         type: 'initUI',
         textNodes: textNodes,
-        availableFontNames: availableFontNames,
+        fontNamesByUsage: fontNamesByUsage,
         availableFontWeights: availableFontWeights,
         availableFontSizes: availableFontSizes,
         availableTextStyles: availableTextStyles
