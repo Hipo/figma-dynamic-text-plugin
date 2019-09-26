@@ -96,7 +96,7 @@ function InitUI() {
         availableTextStyles: availableTextStyles
     });
 }
-figma.showUI(__html__);
+figma.showUI(__html__, { width: 484, height: 600 });
 InitUI();
 figma.ui.onmessage = msg => {
     if (msg.type === 'create-new-style') {
