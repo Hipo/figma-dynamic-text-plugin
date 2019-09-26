@@ -1,9 +1,8 @@
 <style type="text/css">
-
     .font-custom-select {
         width: 468px;
         height: 40px;
-        margin-bottom:10px;
+        margin-bottom: 10px;
         border: 1px solid #D7D7D7;
         border-radius: 0;
         background: #ffffff;
@@ -12,15 +11,6 @@
     .container {
         display: flex;
         flex-flow: row wrap;
-    }
-
-    .footer {
-        display: none;
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: white;
     }
 
     .button {
@@ -32,15 +22,26 @@
         font-size: 14px;
         cursor: pointer;
     }
+
+    .usage-list {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: 468px;
+        height: 10px;
+        overflow-y: scroll;
+    }
 </style>
 
 <select id="font-options" class="font-custom-select"></select>
-<select id="font-weights"  class="font-custom-select"></select>
-<select id="font-sizes"  class="font-custom-select"></select>
+<select id="font-weights" class="font-custom-select"></select>
+<select id="font-sizes" class="font-custom-select"></select>
 
 <button id="run_script" class="button">Run Script</button>
 
 <p id="usage-text"></p>
+
+<ul id="usage-list">
+</ul>
 
 <script>
     var textNodes = [];
@@ -49,6 +50,8 @@
     var availableFontSizes = [];
 
     function filterTextNodes(fontName, fontWeight, fontSize) {
+        var usageList = document.getElementById("usage-list");
+        usageList.innerHTML = '';
         var filteredTextNodes = textNodes.filter(function (node) {
             if (fontName && node.fontName != fontName) {
                 return false;
@@ -59,6 +62,10 @@
             if (fontSize && node.fontSize != fontSize) {
                 return false;
             }
+            var listItem = document.createElement("li");
+            console.log(node)
+            listItem.appendChild(document.createTextNode(node.id + " - " +node.characters));
+            usageList.appendChild(listItem);
             return true;
         });
         document.getElementById("usage-text").innerHTML = filteredTextNodes.length + " Usage";
