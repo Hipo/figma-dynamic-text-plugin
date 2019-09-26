@@ -40,6 +40,10 @@
         padding: 0;
     }
 
+    .linkedList{
+        color: #2091C1;
+    }
+
     .usage-text {
         color: #20C17E;
         font-weight: bold;
@@ -79,8 +83,16 @@
             var listItem = document.createElement("li");
             console.log(node)
             listItem.appendChild(document.createTextNode(node.id + " - " +node.characters));
+            listItem.className = "linkedList"
+            listItem.setAttribute("id", node.id);
             usageList.appendChild(listItem);
             return true;
+        });
+
+        usageList.addEventListener("click",function(e) {
+            if (e.target && e.target.matches("li")) {
+                onTextNodeClick(e.target.id.toString())
+            }
         });
         document.getElementById("usage-text").innerHTML = filteredTextNodes.length + " Usage";
         // parent.postMessage({ pluginMessage: { type: 'create-new-style', filteredTextNodes } }, '*')
