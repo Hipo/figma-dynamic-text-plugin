@@ -4,6 +4,7 @@
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (see documentation).
 let availableTextStyles = [];
+let textNodesWithoutFontFamily = [];
 let textNodes = [];
 let fontNamesByUsage = {};
 let availableFontWeights = [];
@@ -23,7 +24,7 @@ function collectTextNodeInfo(selection) {
             });
         }
         else {
-            if (node.type === 'TEXT' && node.fontName.family) {
+            if (node.type === 'TEXT') {
                 let node_data = {
                     "id": node.id,
                     "characters": node.characters,
@@ -31,7 +32,12 @@ function collectTextNodeInfo(selection) {
                     "fontWeight": node.fontName.style,
                     "fontSize": node.fontSize
                 };
-                textNodes.push(node_data);
+                if (node.fontName.family) {
+                    textNodes.push(node_data);
+                }
+                else {
+                    textNodesWithoutFontFamily.push(node_data);
+                }
                 if (fontNamesByUsage.hasOwnProperty(node_data.fontName)) {
                     // increase count
                     fontNamesByUsage[node_data.fontName] += 1;
@@ -55,6 +61,7 @@ function InitUI() {
     figma.ui.postMessage({
         type: 'initUI',
         textNodes: textNodes,
+        textNodesWithoutFontFamily: textNodesWithoutFontFamily,
         fontNamesByUsage: fontNamesByUsage,
         availableFontWeights: availableFontWeights,
         availableFontSizes: availableFontSizes,
