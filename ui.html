@@ -32,9 +32,7 @@
 
 <button id="run_script" class="button">Run Script</button>
 
-<div id="result-filter">
-
-</div>
+<p id="usage-text"></p>
 
 <script>
     var textNodes = [];
@@ -55,10 +53,7 @@
             }
             return true;
         });
-        var usageParagraph = document.createElement("p");
-        var usageText = document.createTextNode(filteredTextNodes.length + " Usage");
-        usageParagraph.appendChild(usageText)
-        document.getElementById("result-filter").appendChild(usageParagraph);
+        document.getElementById("usage-text").innerHTML = filteredTextNodes.length + " Usage";
         console.log(filteredTextNodes);
     }
 
