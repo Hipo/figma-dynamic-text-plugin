@@ -96,7 +96,7 @@ function createNewStyle(textNodes, newStyleName) {
 
 function assignToStyle(textNodes, textStyleId) {
     textNodes.forEach(value => {
-        let textNode = <TextNode>figma.getNodeById(value);
+        let textNode = <TextNode>figma.getNodeById(value.id);
         textNode.textStyleId = textStyleId
     })
 }

@@ -574,8 +574,6 @@
         let selectedIndex = styleSelector.selectedIndex;
         if (selectedIndex > 0) {
             if (selectedIndex === CREATE_NEW_STYLE_INDEX) {
-                // let styleId = styleSelector.options[selectedIndex].value;
-                // parent.postMessage({pluginMessage: {type: 'create-new-style', filteredTextNodes, styleId}}, '*')
                 let modalText = prepareBottomModalText("", filteredTextNodes.length, true);
                 showBottomModal(modalText, 0, true)
             } else {
