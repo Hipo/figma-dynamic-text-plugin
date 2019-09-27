@@ -114,7 +114,7 @@ function InitUI() {
     });
 }
 
-figma.showUI(__html__, { width: 460, height: 630 });
+figma.showUI(__html__, { width: 460, height: 570 });
 
 InitUI();
 
