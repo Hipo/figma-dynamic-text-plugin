@@ -663,35 +663,24 @@
         var selectFonts = document.getElementById("font-options");
         var selectedFont = selectFonts.options[selectFonts.selectedIndex].value;
         var selectFontWeights = document.getElementById("font-weights");
-        var selectSizes = document.getElementById("font-sizes");
         var fontWeightOptions = [];
-        var fontSizeOptions = [];
         textNodes.forEach(function(node, index){
             if (node.fontName == selectedFont){
                 if (fontWeightOptions.indexOf(node.fontWeight) < 0) {
                     fontWeightOptions.push(node.fontWeight);
                 }
-                if (fontSizeOptions.indexOf(node.fontSize) < 0) {
-                    fontSizeOptions.push(node.fontSize);
-                }
             }
         });
 
         removeOptions(selectFontWeights);
-        removeOptions(selectSizes);
 
         fontWeightOptions.sort().forEach(function(item, index){
             createOptionAndAddToSelector(item, item, 'font-weights');
         });
 
-        fontSizeOptions.sort(function(a, b){return a-b}).forEach(function(item, index){
-            createOptionAndAddToSelector(item, item, 'font-sizes');
-        });
-
-        $("#font-sizes").selectric("refresh");
         $("#font-weights").selectric("refresh");
 
-        getSelectedFontsAndSendToFilter();
+        onFontWeightsChange();
     }
 
     function onFontWeightsChange(){
@@ -772,7 +761,6 @@
             $(".font-custom-select").selectric();
             $(".style-custom-select").selectric();
             onFontOptionsChange();
-            onFontWeightsChange();
 
             // Get first selectric.
             fontOptionsSelectrict = $(".selectric-scroll").first();
