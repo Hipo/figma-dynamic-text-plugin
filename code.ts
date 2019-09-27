@@ -70,7 +70,6 @@ function collectTextNodeInfo(selection) {
 
 function createNewStyle(textNodes, newStyleName) {
     if (textNodes.length > 0) {
-        console.log(figma.getNodeById(textNodes[0].id));
         let textNode = <TextNode>figma.getNodeById(textNodes[0].id);
         let textNodeFont = <FontName>textNode.fontName;
 
@@ -103,7 +102,7 @@ function assignToStyle(textNodes, textStyleId) {
 
 function InitUI() {
     collectTextNodeInfo(figma.root.children);
-    figma.ui.postMessage({
+    figma.ui.postMessage(JSON.stringify({
         type: 'initUI',
         textNodes:textNodes,
         textNodesWithoutFontFamily:textNodesWithoutFontFamily,
@@ -111,7 +110,7 @@ function InitUI() {
         availableFontWeights: availableFontWeights,
         availableFontSizes: availableFontSizes,
         availableTextStyles: availableTextStyles
-    });
+    }));
 }
 
 figma.showUI(__html__, { width: 460, height: 570 });

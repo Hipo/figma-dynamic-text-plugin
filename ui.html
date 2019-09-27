@@ -709,8 +709,7 @@
     }
 
     onmessage = (e) => {
-        var msg = event.data.pluginMessage;
-        console.log(msg);
+        var msg = JSON.parse(event.data.pluginMessage);
 
         if (msg.type == "initUI") {
             if (!navigator.onLine) {
