@@ -259,6 +259,15 @@
         font-size: 14px;
     }
 
+    li .usage{
+        color: #20C17E;
+        float:right;
+    }
+
+    li .usage_font_name{
+        float:left;
+    }
+
     .font-custom-select {
         width: 440px;
         height: 40px;
@@ -516,7 +525,7 @@
 
 <script>
     var textNodes = [];
-    var availableFontNames = [];
+    var fontNamesByUsage = {};
     var availableFontWeights = [];
     var availableFontSizes = [];
     var availableTextStyles = [];
@@ -646,7 +655,7 @@
 
             Object.keys(fontNamesByUsage).forEach(element => {
                 if (element != null) {
-                    var text = element + " " + fontNamesByUsage[element];
+                    var text = element;
                     createOptionAndAddToSelector(text, element, 'font-options')
                 }
             });
@@ -672,6 +681,14 @@
 
             $(".font-custom-select").selectric();
             getSelectedFontsAndSendToFilter()
+
+            // Get first selectric.
+            fontOptionsSelectrict = $(".selectric-scroll").first();
+            $(fontOptionsSelectrict).find("li").each(function(index, item){
+                var fontName = $(item).html();
+                console.log($(item).html('<span class="usage_font_name">'+ fontName + '</span><span class="usage">' + fontNamesByUsage[fontName] +' Uses</span>'));
+            });
+
         }
 
         function createOptionAndAddToSelector(text, value, selectorName) {
