@@ -223,7 +223,7 @@
                         <input id="style-name-input-field" type="text" class="style-input-field" hidden="hidden">
                     </div>
                     <div class="dialog-right-align">
-                        <button id="confirm" class="button">Confirm</button>
+                        <button id="confirm-button" class="button">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -316,7 +316,7 @@
 
     function showBottomModal(text, styleId, isCreateNewStyle) {
         let modal = document.getElementById("bottomModal");
-        let confirmButton = document.getElementById("confirm");
+        let confirmButton = document.getElementById("confirm-button");
         let closeButton = document.getElementsByClassName("close")[0];
         let modalHeaderText = document.getElementById("modal-header-text");
 
@@ -335,15 +335,17 @@
 
         // TODO add onClick for confirm button that triggers postMessage
 
-        confirmButton.onclick = function () {
+        confirmButton.addEventListener('click', function () {
+            if (isCreateNewStyle){
+                let newStyleName = document.getElementById('style-name-input-field').value;
+                parent.postMessage({pluginMessage: {type: 'create-new-style', filteredTextNodes, newStyleName}}, '*')
+            } else {
+                parent.postMessage({pluginMessage: {type: 'assign-to-selected-style', filteredTextNodes, styleId}}, '*')
+            }
+            modal.style.display = "none";
+        });
 
-        };
-
-        if (isCreateNewStyle){
-            document.getElementById('style-name-input-field').hidden = false;
-        } else {
-            document.getElementById('style-name-input-field').hidden = true;
-        }
+        document.getElementById('style-name-input-field').hidden = !isCreateNewStyle;
 
         modal.style.display = "block";
     }

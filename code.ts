@@ -68,7 +68,7 @@ function collectTextNodeInfo(selection) {
 	selection.forEach(item => childrenIterator(item))
 }
 
-function createNewStyle(textNodes) {
+function createNewStyle(textNodes, newStyleName) {
     if (textNodes.length > 0) {
         console.log(figma.getNodeById(textNodes[0].id));
         let textNode = <TextNode>figma.getNodeById(textNodes[0].id);
@@ -77,7 +77,11 @@ function createNewStyle(textNodes) {
         figma.loadFontAsync({family: textNodeFont.family, style: textNodeFont.style}).then(value1 => {
 
             let newTextStyle = figma.createTextStyle();
-            newTextStyle.name = "New Style";
+            if(newStyleName == "") {
+                newTextStyle.name = "undefined"
+            } else {
+                newTextStyle.name = newStyleName;
+            }
             newTextStyle.fontName = textNodeFont;
             newTextStyle.fontSize = <number>textNode.fontSize;
 
@@ -90,7 +94,7 @@ function createNewStyle(textNodes) {
 }
 
 
-function assignToStyle(textNodes, textStyleId: string) {
+function assignToStyle(textNodes, textStyleId) {
     textNodes.forEach(value => {
         let textNode = <TextNode>figma.getNodeById(value);
         textNode.textStyleId = textStyleId
@@ -118,12 +122,12 @@ figma.ui.onmessage = msg => {
     if (msg.type === 'create-new-style') {
         let textNodeList = msg.filteredTextNodes;
         let newStyleName = msg.newStyleName;
-        createNewStyle(textNodeList)
+        createNewStyle(textNodeList, newStyleName)
     }
 
     if (msg.type === 'assign-to-selected-style') {
         let textNodeList = msg.filteredTextNodes;
-        let textStyleId = msg.textStyleId;
+        let textStyleId = msg.styleId;
         assignToStyle(textNodeList, textStyleId)
     }
 
