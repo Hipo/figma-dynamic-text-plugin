@@ -489,49 +489,49 @@
 <div id="online_mode" hidden="hidden">
 
     <select id="font-options" class="font-custom-select" onchange="onFontOptionsChange()"></select>
-<select id="font-weights" class="font-custom-select" onchange="onFontWeightsChange()"></select>
-<select id="font-sizes" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
+    <select id="font-weights" class="font-custom-select" onchange="onFontWeightsChange()"></select>
+    <select id="font-sizes" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
 
-<hr />
-<div class="usage-table">
-    <div class="usage-table-row">
-        <div class="usage-table-left-align">
-            <p id="usage-text" class="usage-text"></p>
-        </div>
-        <div class="usage-table-right-align">
-            <select id="style-spinner" class="style-custom-select" onchange="onStyleSelectorChanged()"></select>
+    <hr />
+    <div class="usage-table">
+        <div class="usage-table-row">
+            <div class="usage-table-left-align">
+                <p id="usage-text" class="usage-text"></p>
+            </div>
+            <div class="usage-table-right-align">
+                <select id="style-spinner" class="style-custom-select" onchange="onStyleSelectorChanged()"></select>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- The Modal -->
-<div id="bottomModal" class="modal">
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close">&times;</span>
-            <p id="modal-header-text"></p>
-        </div>
-        <div class="modal-body">
-            <div class="table">
-                <div class="table-row">
-                    <div class="dialog-left-align">
-                        <input id="style-name-input-field" type="text" class="style-input-field" hidden="hidden">
-                    </div>
-                    <div class="dialog-right-align">
-                        <button id="confirm-button" class="button">Confirm</button>
+    <!-- The Modal -->
+    <div id="bottomModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <p id="modal-header-text"></p>
+            </div>
+            <div class="modal-body">
+                <div class="table">
+                    <div class="table-row">
+                        <div class="dialog-left-align">
+                            <input id="style-name-input-field" type="text" class="style-input-field" hidden="hidden">
+                        </div>
+                        <div class="dialog-right-align">
+                            <button id="confirm-button" class="button">Confirm</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <hr />
+    <div class="usage-list-wrapper">
+        <ul id="usage-list">
+        </ul>
+    </div>
 </div>
-<hr />
-<div class="usage-list-wrapper">
-    <ul id="usage-list">
-    </ul>
-</div>
-
 
 <script>
     var textNodes = [];
