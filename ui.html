@@ -753,7 +753,7 @@
             createOptionAndAddToSelector("+ Create New", "create-new", 'style-spinner');
             availableTextStyles.forEach(element => {
                 if (element != null) {
-                    createOptionAndAddToSelector(element.name, element.id, 'style-spinner');
+                    createOptionAndAddToSelector(element.name + " (" + element.fontName + ", "+ element.fontWeight + ", " + element.fontSize +")", element.id, 'style-spinner');
                 }
             })
 

@@ -21,7 +21,10 @@ function collectTextNodeInfo(selection) {
     figma.getLocalTextStyles().forEach(function(style){
         availableTextStyles.push({
             id: style.id,
-            name: style.name
+            name: style.name,
+            fontSize: style.fontSize,
+            fontName: style.fontName.family,
+            fontWeight: style.fontName.style
         });
     });
 
