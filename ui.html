@@ -654,6 +654,11 @@
             console.log(availableFontSizes);
             console.log(availableTextStyles);
 
+            // Create empty options
+            createOptionAndAddToSelector("Font", "", 'font-options');
+            createOptionAndAddToSelector("Weight", "", 'font-weights');
+            createOptionAndAddToSelector("Size", "", 'font-sizes');
+
             Object.keys(fontNamesByUsage).forEach(element => {
                 if (element != null) {
                     var text = element;
@@ -688,7 +693,10 @@
             fontOptionsSelectrict = $(".selectric-scroll").first();
             $(fontOptionsSelectrict).find("li").each(function(index, item){
                 var fontName = $(item).html();
-                console.log($(item).html('<span class="usage_font_name">'+ fontName + '</span><span class="usage">' + fontNamesByUsage[fontName] +' Uses</span>'));
+                // Skip default value "Font".
+                if (fontName != "Font"){
+                    $(item).html('<span class="usage_font_name">'+ fontName + '</span><span class="usage">' + fontNamesByUsage[fontName] +' Uses</span>');
+                }
             });
 
         }
