@@ -671,11 +671,11 @@
         removeOptions(selectFontWeights);
         removeOptions(selectSizes);
 
-        fontWeightOptions.forEach(function(item, index){
+        fontWeightOptions.sort().forEach(function(item, index){
             createOptionAndAddToSelector(item, item, 'font-weights');
         });
 
-        fontSizeOptions.forEach(function(item, index){
+        fontSizeOptions.sort(function(a, b){return a-b}).forEach(function(item, index){
             createOptionAndAddToSelector(item, item, 'font-sizes');
         });
 
@@ -702,7 +702,7 @@
 
         removeOptions(selectSizes);
 
-        fontSizeOptions.forEach(function(item, index){
+        fontSizeOptions.sort(function(a, b){return a-b}).forEach(function(item, index){
             createOptionAndAddToSelector(item, item, 'font-sizes');
         });
 
@@ -721,7 +721,7 @@
             availableFontSizes = msg.availableFontSizes;
             availableTextStyles = msg.availableTextStyles;
 
-            Object.keys(fontNamesByUsage).forEach(element => {
+            Object.keys(fontNamesByUsage).sort().forEach(element => {
                 if (element != null) {
                     var text = element;
                     createOptionAndAddToSelector(text, element, 'font-options')
