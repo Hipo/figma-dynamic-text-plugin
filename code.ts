@@ -77,7 +77,7 @@ function createNewStyle(textNodes) {
         figma.loadFontAsync({family: textNodeFont.family, style: textNodeFont.style}).then(value1 => {
 
             let newTextStyle = figma.createTextStyle();
-            newTextStyle.name = "undefined";
+            newTextStyle.name = "New Style";
             newTextStyle.fontName = textNodeFont;
             newTextStyle.fontSize = <number>textNode.fontSize;
 
@@ -117,6 +117,7 @@ InitUI();
 figma.ui.onmessage = msg => {
     if (msg.type === 'create-new-style') {
         let textNodeList = msg.filteredTextNodes;
+        let newStyleName = msg.newStyleName;
         createNewStyle(textNodeList)
     }
 

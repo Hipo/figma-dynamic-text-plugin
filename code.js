@@ -68,7 +68,7 @@ function createNewStyle(textNodes) {
         var textNodeFont_1 = textNode_1.fontName;
         figma.loadFontAsync({ family: textNodeFont_1.family, style: textNodeFont_1.style }).then(function (value1) {
             var newTextStyle = figma.createTextStyle();
-            newTextStyle.name = "undefined";
+            newTextStyle.name = "New Style";
             newTextStyle.fontName = textNodeFont_1;
             newTextStyle.fontSize = textNode_1.fontSize;
             textNodes.forEach(function (value) {
@@ -101,6 +101,7 @@ InitUI();
 figma.ui.onmessage = function (msg) {
     if (msg.type === 'create-new-style') {
         var textNodeList = msg.filteredTextNodes;
+        var newStyleName = msg.newStyleName;
         createNewStyle(textNodeList);
     }
     if (msg.type === 'assign-to-selected-style') {
