@@ -1,542 +1,255 @@
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
     /*! Selectric ϟ v1.13.0 (2017-08-22) - git.io/tjl9sQ - Copyright (c) 2017 Leonardo Santos - MIT License */
-    !function (e) {
-        "function" == typeof define && define.amd ? define(["jquery"], e) : "object" == typeof module && module.exports ? module.exports = function (t, s) {
-            return void 0 === s && (s = "undefined" != typeof window ? require("jquery") : require("jquery")(t)), e(s), s
-        } : e(jQuery)
-    }(function (e) {
-        "use strict";
-        var t = e(document), s = e(window), l = ["a", "e", "i", "o", "u", "n", "c", "y"],
-            i = [/[\xE0-\xE5]/g, /[\xE8-\xEB]/g, /[\xEC-\xEF]/g, /[\xF2-\xF6]/g, /[\xF9-\xFC]/g, /[\xF1]/g, /[\xE7]/g, /[\xFD-\xFF]/g],
-            n = function (t, s) {
-                var l = this;
-                l.element = t, l.$element = e(t), l.state = {
-                    multiple: !!l.$element.attr("multiple"),
-                    enabled: !1,
-                    opened: !1,
-                    currValue: -1,
-                    selectedIdx: -1,
-                    highlightedIdx: -1
-                }, l.eventTriggers = {
-                    open: l.open,
-                    close: l.close,
-                    destroy: l.destroy,
-                    refresh: l.refresh,
-                    init: l.init
-                }, l.init(s)
-            };
-        n.prototype = {
-            utils: {
-                isMobile: function () {
-                    return /android|ip(hone|od|ad)/i.test(navigator.userAgent)
-                }, escapeRegExp: function (e) {
-                    return e.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-                }, replaceDiacritics: function (e) {
-                    for (var t = i.length; t--;) e = e.toLowerCase().replace(i[t], l[t]);
-                    return e
-                }, format: function (e) {
-                    var t = arguments;
-                    return ("" + e).replace(/\{(?:(\d+)|(\w+))\}/g, function (e, s, l) {
-                        return l && t[1] ? t[1][l] : t[s]
-                    })
-                }, nextEnabledItem: function (e, t) {
-                    for (; e[t = (t + 1) % e.length].disabled;) ;
-                    return t
-                }, previousEnabledItem: function (e, t) {
-                    for (; e[t = (t > 0 ? t : e.length) - 1].disabled;) ;
-                    return t
-                }, toDash: function (e) {
-                    return e.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
-                }, triggerCallback: function (t, s) {
-                    var l = s.element, i = s.options["on" + t], n = [l].concat([].slice.call(arguments).slice(1));
-                    e.isFunction(i) && i.apply(l, n), e(l).trigger("selectric-" + this.toDash(t), n)
-                }, arrayToClassname: function (t) {
-                    var s = e.grep(t, function (e) {
-                        return !!e
-                    });
-                    return e.trim(s.join(" "))
-                }
-            }, init: function (t) {
-                var s = this;
-                if (s.options = e.extend(!0, {}, e.fn.selectric.defaults, s.options, t), s.utils.triggerCallback("BeforeInit", s), s.destroy(!0), s.options.disableOnMobile && s.utils.isMobile()) return void (s.disableOnMobile = !0);
-                s.classes = s.getClassNames();
-                var l = e("<input/>", {class: s.classes.input, readonly: s.utils.isMobile()}),
-                    i = e("<div/>", {class: s.classes.items, tabindex: -1}), n = e("<div/>", {class: s.classes.scroll}),
-                    a = e("<div/>", {class: s.classes.prefix, html: s.options.arrowButtonMarkup}),
-                    o = e("<span/>", {class: "label"}),
-                    r = s.$element.wrap("<div/>").parent().append(a.prepend(o), i, l),
-                    u = e("<div/>", {class: s.classes.hideselect});
-                s.elements = {
-                    input: l,
-                    items: i,
-                    itemsScroll: n,
-                    wrapper: a,
-                    label: o,
-                    outerWrapper: r
-                }, s.options.nativeOnMobile && s.utils.isMobile() && (s.elements.input = void 0, u.addClass(s.classes.prefix + "-is-native"), s.$element.on("change", function () {
-                    s.refresh()
-                })), s.$element.on(s.eventTriggers).wrap(u), s.originalTabindex = s.$element.prop("tabindex"), s.$element.prop("tabindex", -1), s.populate(), s.activate(), s.utils.triggerCallback("Init", s)
-            }, activate: function () {
-                var e = this, t = e.elements.items.closest(":visible").children(":hidden").addClass(e.classes.tempshow),
-                    s = e.$element.width();
-                t.removeClass(e.classes.tempshow), e.utils.triggerCallback("BeforeActivate", e), e.elements.outerWrapper.prop("class", e.utils.arrayToClassname([e.classes.wrapper, e.$element.prop("class").replace(/\S+/g, e.classes.prefix + "-$&"), e.options.responsive ? e.classes.responsive : ""])), e.options.inheritOriginalWidth && s > 0 && e.elements.outerWrapper.width(s), e.unbindEvents(), e.$element.prop("disabled") ? (e.elements.outerWrapper.addClass(e.classes.disabled), e.elements.input && e.elements.input.prop("disabled", !0)) : (e.state.enabled = !0, e.elements.outerWrapper.removeClass(e.classes.disabled), e.$li = e.elements.items.removeAttr("style").find("li"), e.bindEvents()), e.utils.triggerCallback("Activate", e)
-            }, getClassNames: function () {
-                var t = this, s = t.options.customClass, l = {};
-                return e.each("Input Items Open Disabled TempShow HideSelect Wrapper Focus Hover Responsive Above Below Scroll Group GroupLabel".split(" "), function (e, i) {
-                    var n = s.prefix + i;
-                    l[i.toLowerCase()] = s.camelCase ? n : t.utils.toDash(n)
-                }), l.prefix = s.prefix, l
-            }, setLabel: function () {
-                var t = this, s = t.options.labelBuilder;
-                if (t.state.multiple) {
-                    var l = e.isArray(t.state.currValue) ? t.state.currValue : [t.state.currValue];
-                    l = 0 === l.length ? [0] : l;
-                    var i = e.map(l, function (s) {
-                        return e.grep(t.lookupItems, function (e) {
-                            return e.index === s
-                        })[0]
-                    });
-                    i = e.grep(i, function (t) {
-                        return i.length > 1 || 0 === i.length ? "" !== e.trim(t.value) : t
-                    }), i = e.map(i, function (l) {
-                        return e.isFunction(s) ? s(l) : t.utils.format(s, l)
-                    }), t.options.multiple.maxLabelEntries && (i.length >= t.options.multiple.maxLabelEntries + 1 ? (i = i.slice(0, t.options.multiple.maxLabelEntries), i.push(e.isFunction(s) ? s({text: "..."}) : t.utils.format(s, {text: "..."}))) : i.slice(i.length - 1)), t.elements.label.html(i.join(t.options.multiple.separator))
-                } else {
-                    var n = t.lookupItems[t.state.currValue];
-                    t.elements.label.html(e.isFunction(s) ? s(n) : t.utils.format(s, n))
-                }
-            }, populate: function () {
-                var t = this, s = t.$element.children(), l = t.$element.find("option"), i = l.filter(":selected"),
-                    n = l.index(i), a = 0, o = t.state.multiple ? [] : 0;
-                i.length > 1 && t.state.multiple && (n = [], i.each(function () {
-                    n.push(e(this).index())
-                })), t.state.currValue = ~n ? n : o, t.state.selectedIdx = t.state.currValue, t.state.highlightedIdx = t.state.currValue, t.items = [], t.lookupItems = [], s.length && (s.each(function (s) {
-                    var l = e(this);
-                    if (l.is("optgroup")) {
-                        var i = {element: l, label: l.prop("label"), groupDisabled: l.prop("disabled"), items: []};
-                        l.children().each(function (s) {
-                            var l = e(this);
-                            i.items[s] = t.getItemData(a, l, i.groupDisabled || l.prop("disabled")), t.lookupItems[a] = i.items[s], a++
-                        }), t.items[s] = i
-                    } else t.items[s] = t.getItemData(a, l, l.prop("disabled")), t.lookupItems[a] = t.items[s], a++
-                }), t.setLabel(), t.elements.items.append(t.elements.itemsScroll.html(t.getItemsMarkup(t.items))))
-            }, getItemData: function (t, s, l) {
-                var i = this;
-                return {
-                    index: t,
-                    element: s,
-                    value: s.val(),
-                    className: s.prop("class"),
-                    text: s.html(),
-                    slug: e.trim(i.utils.replaceDiacritics(s.html())),
-                    alt: s.attr("data-alt"),
-                    selected: s.prop("selected"),
-                    disabled: l
-                }
-            }, getItemsMarkup: function (t) {
-                var s = this, l = "<ul>";
-                return e.isFunction(s.options.listBuilder) && s.options.listBuilder && (t = s.options.listBuilder(t)), e.each(t, function (t, i) {
-                    void 0 !== i.label ? (l += s.utils.format('<ul class="{1}"><li class="{2}">{3}</li>', s.utils.arrayToClassname([s.classes.group, i.groupDisabled ? "disabled" : "", i.element.prop("class")]), s.classes.grouplabel, i.element.prop("label")), e.each(i.items, function (e, t) {
-                        l += s.getItemMarkup(t.index, t)
-                    }), l += "</ul>") : l += s.getItemMarkup(i.index, i)
-                }), l + "</ul>"
-            }, getItemMarkup: function (t, s) {
-                var l = this, i = l.options.optionsItemBuilder,
-                    n = {value: s.value, text: s.text, slug: s.slug, index: s.index};
-                return l.utils.format('<li data-index="{1}" class="{2}">{3}</li>', t, l.utils.arrayToClassname([s.className, t === l.items.length - 1 ? "last" : "", s.disabled ? "disabled" : "", s.selected ? "selected" : ""]), e.isFunction(i) ? l.utils.format(i(s, this.$element, t), s) : l.utils.format(i, n))
-            }, unbindEvents: function () {
-                var e = this;
-                e.elements.wrapper.add(e.$element).add(e.elements.outerWrapper).add(e.elements.input).off(".sl")
-            }, bindEvents: function () {
-                var t = this;
-                t.elements.outerWrapper.on("mouseenter.sl mouseleave.sl", function (s) {
-                    e(this).toggleClass(t.classes.hover, "mouseenter" === s.type), t.options.openOnHover && (clearTimeout(t.closeTimer), "mouseleave" === s.type ? t.closeTimer = setTimeout(e.proxy(t.close, t), t.options.hoverIntentTimeout) : t.open())
-                }), t.elements.wrapper.on("click.sl", function (e) {
-                    t.state.opened ? t.close() : t.open(e)
-                }), t.options.nativeOnMobile && t.utils.isMobile() || (t.$element.on("focus.sl", function () {
-                    t.elements.input.focus()
-                }), t.elements.input.prop({
-                    tabindex: t.originalTabindex,
-                    disabled: !1
-                }).on("keydown.sl", e.proxy(t.handleKeys, t)).on("focusin.sl", function (e) {
-                    t.elements.outerWrapper.addClass(t.classes.focus), t.elements.input.one("blur", function () {
-                        t.elements.input.blur()
-                    }), t.options.openOnFocus && !t.state.opened && t.open(e)
-                }).on("focusout.sl", function () {
-                    t.elements.outerWrapper.removeClass(t.classes.focus)
-                }).on("input propertychange", function () {
-                    var s = t.elements.input.val(), l = new RegExp("^" + t.utils.escapeRegExp(s), "i");
-                    clearTimeout(t.resetStr), t.resetStr = setTimeout(function () {
-                        t.elements.input.val("")
-                    }, t.options.keySearchTimeout), s.length && e.each(t.items, function (e, s) {
-                        if (!s.disabled) {
-                            if (l.test(s.text) || l.test(s.slug)) return void t.highlight(e);
-                            if (s.alt) for (var i = s.alt.split("|"), n = 0; n < i.length && i[n]; n++) if (l.test(i[n].trim())) return void t.highlight(e)
-                        }
-                    })
-                })), t.$li.on({
-                    mousedown: function (e) {
-                        e.preventDefault(), e.stopPropagation()
-                    }, click: function () {
-                        return t.select(e(this).data("index")), !1
-                    }
-                })
-            }, handleKeys: function (t) {
-                var s = this, l = t.which, i = s.options.keys, n = e.inArray(l, i.previous) > -1,
-                    a = e.inArray(l, i.next) > -1, o = e.inArray(l, i.select) > -1, r = e.inArray(l, i.open) > -1,
-                    u = s.state.highlightedIdx, p = n && 0 === u || a && u + 1 === s.items.length, c = 0;
-                if (13 !== l && 32 !== l || t.preventDefault(), n || a) {
-                    if (!s.options.allowWrap && p) return;
-                    n && (c = s.utils.previousEnabledItem(s.lookupItems, u)), a && (c = s.utils.nextEnabledItem(s.lookupItems, u)), s.highlight(c)
-                }
-                if (o && s.state.opened) return s.select(u), void (s.state.multiple && s.options.multiple.keepMenuOpen || s.close());
-                r && !s.state.opened && s.open()
-            }, refresh: function () {
-                var e = this;
-                e.populate(), e.activate(), e.utils.triggerCallback("Refresh", e)
-            }, setOptionsDimensions: function () {
-                var e = this, t = e.elements.items.closest(":visible").children(":hidden").addClass(e.classes.tempshow),
-                    s = e.options.maxHeight, l = e.elements.items.outerWidth(),
-                    i = e.elements.wrapper.outerWidth() - (l - e.elements.items.width());
-                !e.options.expandToItemText || i > l ? e.finalWidth = i : (e.elements.items.css("overflow", "scroll"), e.elements.outerWrapper.width(9e4), e.finalWidth = e.elements.items.width(), e.elements.items.css("overflow", ""), e.elements.outerWrapper.width("")), e.elements.items.width(e.finalWidth).height() > s && e.elements.items.height(s), t.removeClass(e.classes.tempshow)
-            }, isInViewport: function () {
-                var e = this;
-                if (!0 === e.options.forceRenderAbove) e.elements.outerWrapper.addClass(e.classes.above); else if (!0 === e.options.forceRenderBelow) e.elements.outerWrapper.addClass(e.classes.below); else {
-                    var t = s.scrollTop(), l = s.height(), i = e.elements.outerWrapper.offset().top,
-                        n = e.elements.outerWrapper.outerHeight(), a = i + n + e.itemsHeight <= t + l,
-                        o = i - e.itemsHeight > t, r = !a && o, u = !r;
-                    e.elements.outerWrapper.toggleClass(e.classes.above, r), e.elements.outerWrapper.toggleClass(e.classes.below, u)
-                }
-            }, detectItemVisibility: function (t) {
-                var s = this, l = s.$li.filter("[data-index]");
-                s.state.multiple && (t = e.isArray(t) && 0 === t.length ? 0 : t, t = e.isArray(t) ? Math.min.apply(Math, t) : t);
-                var i = l.eq(t).outerHeight(), n = l[t].offsetTop, a = s.elements.itemsScroll.scrollTop(),
-                    o = n + 2 * i;
-                s.elements.itemsScroll.scrollTop(o > a + s.itemsHeight ? o - s.itemsHeight : n - i < a ? n - i : a)
-            }, open: function (s) {
-                var l = this;
-                if (l.options.nativeOnMobile && l.utils.isMobile()) return !1;
-                l.utils.triggerCallback("BeforeOpen", l), s && (s.preventDefault(), l.options.stopPropagation && s.stopPropagation()), l.state.enabled && (l.setOptionsDimensions(), e("." + l.classes.hideselect, "." + l.classes.open).children().selectric("close"), l.state.opened = !0, l.itemsHeight = l.elements.items.outerHeight(), l.itemsInnerHeight = l.elements.items.height(), l.elements.outerWrapper.addClass(l.classes.open), l.elements.input.val(""), s && "focusin" !== s.type && l.elements.input.focus(), setTimeout(function () {
-                    t.on("click.sl", e.proxy(l.close, l)).on("scroll.sl", e.proxy(l.isInViewport, l))
-                }, 1), l.isInViewport(), l.options.preventWindowScroll && t.on("mousewheel.sl DOMMouseScroll.sl", "." + l.classes.scroll, function (t) {
-                    var s = t.originalEvent, i = e(this).scrollTop(), n = 0;
-                    "detail" in s && (n = -1 * s.detail), "wheelDelta" in s && (n = s.wheelDelta), "wheelDeltaY" in s && (n = s.wheelDeltaY), "deltaY" in s && (n = -1 * s.deltaY), (i === this.scrollHeight - l.itemsInnerHeight && n < 0 || 0 === i && n > 0) && t.preventDefault()
-                }), l.detectItemVisibility(l.state.selectedIdx), l.highlight(l.state.multiple ? -1 : l.state.selectedIdx), l.utils.triggerCallback("Open", l))
-            }, close: function () {
-                var e = this;
-                e.utils.triggerCallback("BeforeClose", e), t.off(".sl"), e.elements.outerWrapper.removeClass(e.classes.open), e.state.opened = !1, e.utils.triggerCallback("Close", e)
-            }, change: function () {
-                var t = this;
-                t.utils.triggerCallback("BeforeChange", t), t.state.multiple ? (e.each(t.lookupItems, function (e) {
-                    t.lookupItems[e].selected = !1, t.$element.find("option").prop("selected", !1)
-                }), e.each(t.state.selectedIdx, function (e, s) {
-                    t.lookupItems[s].selected = !0, t.$element.find("option").eq(s).prop("selected", !0)
-                }), t.state.currValue = t.state.selectedIdx, t.setLabel(), t.utils.triggerCallback("Change", t)) : t.state.currValue !== t.state.selectedIdx && (t.$element.prop("selectedIndex", t.state.currValue = t.state.selectedIdx).data("value", t.lookupItems[t.state.selectedIdx].text), t.setLabel(), t.utils.triggerCallback("Change", t))
-            }, highlight: function (e) {
-                var t = this, s = t.$li.filter("[data-index]").removeClass("highlighted");
-                t.utils.triggerCallback("BeforeHighlight", t), void 0 === e || -1 === e || t.lookupItems[e].disabled || (s.eq(t.state.highlightedIdx = e).addClass("highlighted"), t.detectItemVisibility(e), t.utils.triggerCallback("Highlight", t))
-            }, select: function (t) {
-                var s = this, l = s.$li.filter("[data-index]");
-                if (s.utils.triggerCallback("BeforeSelect", s, t), void 0 !== t && -1 !== t && !s.lookupItems[t].disabled) {
-                    if (s.state.multiple) {
-                        s.state.selectedIdx = e.isArray(s.state.selectedIdx) ? s.state.selectedIdx : [s.state.selectedIdx];
-                        var i = e.inArray(t, s.state.selectedIdx);
-                        -1 !== i ? s.state.selectedIdx.splice(i, 1) : s.state.selectedIdx.push(t), l.removeClass("selected").filter(function (t) {
-                            return -1 !== e.inArray(t, s.state.selectedIdx)
-                        }).addClass("selected")
-                    } else l.removeClass("selected").eq(s.state.selectedIdx = t).addClass("selected");
-                    s.state.multiple && s.options.multiple.keepMenuOpen || s.close(), s.change(), s.utils.triggerCallback("Select", s, t)
-                }
-            }, destroy: function (e) {
-                var t = this;
-                t.state && t.state.enabled && (t.elements.items.add(t.elements.wrapper).add(t.elements.input).remove(), e || t.$element.removeData("selectric").removeData("value"), t.$element.prop("tabindex", t.originalTabindex).off(".sl").off(t.eventTriggers).unwrap().unwrap(), t.state.enabled = !1)
-            }
-        }, e.fn.selectric = function (t) {
-            return this.each(function () {
-                var s = e.data(this, "selectric");
-                s && !s.disableOnMobile ? "string" == typeof t && s[t] ? s[t]() : s.init(t) : e.data(this, "selectric", new n(this, t))
-            })
-        }, e.fn.selectric.defaults = {
-            onChange: function (t) {
-                e(t).change()
-            },
-            maxHeight: 300,
-            keySearchTimeout: 500,
-            arrowButtonMarkup: '<b class="button">&#x25be;</b>',
-            disableOnMobile: !1,
-            nativeOnMobile: !0,
-            openOnFocus: !0,
-            openOnHover: !1,
-            hoverIntentTimeout: 500,
-            expandToItemText: !1,
-            responsive: !1,
-            preventWindowScroll: !0,
-            inheritOriginalWidth: !1,
-            allowWrap: !0,
-            forceRenderAbove: !1,
-            forceRenderBelow: !1,
-            stopPropagation: !0,
-            optionsItemBuilder: "{text}",
-            labelBuilder: "{text}",
-            listBuilder: !1,
-            keys: {
-                previous: [37, 38],
-                next: [39, 40],
-                select: [9, 13, 27],
-                open: [13, 32, 37, 38, 39, 40],
-                close: [9, 27]
-            },
-            customClass: {prefix: "selectric", camelCase: !1},
-            multiple: {separator: ", ", keepMenuOpen: !0, maxLabelEntries: !1}
-        }
-    });
+!function(e){"function"==typeof define&&define.amd?define(["jquery"],e):"object"==typeof module&&module.exports?module.exports=function(t,s){return void 0===s&&(s="undefined"!=typeof window?require("jquery"):require("jquery")(t)),e(s),s}:e(jQuery)}(function(e){"use strict";var t=e(document),s=e(window),l=["a","e","i","o","u","n","c","y"],i=[/[\xE0-\xE5]/g,/[\xE8-\xEB]/g,/[\xEC-\xEF]/g,/[\xF2-\xF6]/g,/[\xF9-\xFC]/g,/[\xF1]/g,/[\xE7]/g,/[\xFD-\xFF]/g],n=function(t,s){var l=this;l.element=t,l.$element=e(t),l.state={multiple:!!l.$element.attr("multiple"),enabled:!1,opened:!1,currValue:-1,selectedIdx:-1,highlightedIdx:-1},l.eventTriggers={open:l.open,close:l.close,destroy:l.destroy,refresh:l.refresh,init:l.init},l.init(s)};n.prototype={utils:{isMobile:function(){return/android|ip(hone|od|ad)/i.test(navigator.userAgent)},escapeRegExp:function(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")},replaceDiacritics:function(e){for(var t=i.length;t--;)e=e.toLowerCase().replace(i[t],l[t]);return e},format:function(e){var t=arguments;return(""+e).replace(/\{(?:(\d+)|(\w+))\}/g,function(e,s,l){return l&&t[1]?t[1][l]:t[s]})},nextEnabledItem:function(e,t){for(;e[t=(t+1)%e.length].disabled;);return t},previousEnabledItem:function(e,t){for(;e[t=(t>0?t:e.length)-1].disabled;);return t},toDash:function(e){return e.replace(/([a-z0-9])([A-Z])/g,"$1-$2").toLowerCase()},triggerCallback:function(t,s){var l=s.element,i=s.options["on"+t],n=[l].concat([].slice.call(arguments).slice(1));e.isFunction(i)&&i.apply(l,n),e(l).trigger("selectric-"+this.toDash(t),n)},arrayToClassname:function(t){var s=e.grep(t,function(e){return!!e});return e.trim(s.join(" "))}},init:function(t){var s=this;if(s.options=e.extend(!0,{},e.fn.selectric.defaults,s.options,t),s.utils.triggerCallback("BeforeInit",s),s.destroy(!0),s.options.disableOnMobile&&s.utils.isMobile())return void(s.disableOnMobile=!0);s.classes=s.getClassNames();var l=e("<input/>",{class:s.classes.input,readonly:s.utils.isMobile()}),i=e("<div/>",{class:s.classes.items,tabindex:-1}),n=e("<div/>",{class:s.classes.scroll}),a=e("<div/>",{class:s.classes.prefix,html:s.options.arrowButtonMarkup}),o=e("<span/>",{class:"label"}),r=s.$element.wrap("<div/>").parent().append(a.prepend(o),i,l),u=e("<div/>",{class:s.classes.hideselect});s.elements={input:l,items:i,itemsScroll:n,wrapper:a,label:o,outerWrapper:r},s.options.nativeOnMobile&&s.utils.isMobile()&&(s.elements.input=void 0,u.addClass(s.classes.prefix+"-is-native"),s.$element.on("change",function(){s.refresh()})),s.$element.on(s.eventTriggers).wrap(u),s.originalTabindex=s.$element.prop("tabindex"),s.$element.prop("tabindex",-1),s.populate(),s.activate(),s.utils.triggerCallback("Init",s)},activate:function(){var e=this,t=e.elements.items.closest(":visible").children(":hidden").addClass(e.classes.tempshow),s=e.$element.width();t.removeClass(e.classes.tempshow),e.utils.triggerCallback("BeforeActivate",e),e.elements.outerWrapper.prop("class",e.utils.arrayToClassname([e.classes.wrapper,e.$element.prop("class").replace(/\S+/g,e.classes.prefix+"-$&"),e.options.responsive?e.classes.responsive:""])),e.options.inheritOriginalWidth&&s>0&&e.elements.outerWrapper.width(s),e.unbindEvents(),e.$element.prop("disabled")?(e.elements.outerWrapper.addClass(e.classes.disabled),e.elements.input&&e.elements.input.prop("disabled",!0)):(e.state.enabled=!0,e.elements.outerWrapper.removeClass(e.classes.disabled),e.$li=e.elements.items.removeAttr("style").find("li"),e.bindEvents()),e.utils.triggerCallback("Activate",e)},getClassNames:function(){var t=this,s=t.options.customClass,l={};return e.each("Input Items Open Disabled TempShow HideSelect Wrapper Focus Hover Responsive Above Below Scroll Group GroupLabel".split(" "),function(e,i){var n=s.prefix+i;l[i.toLowerCase()]=s.camelCase?n:t.utils.toDash(n)}),l.prefix=s.prefix,l},setLabel:function(){var t=this,s=t.options.labelBuilder;if(t.state.multiple){var l=e.isArray(t.state.currValue)?t.state.currValue:[t.state.currValue];l=0===l.length?[0]:l;var i=e.map(l,function(s){return e.grep(t.lookupItems,function(e){return e.index===s})[0]});i=e.grep(i,function(t){return i.length>1||0===i.length?""!==e.trim(t.value):t}),i=e.map(i,function(l){return e.isFunction(s)?s(l):t.utils.format(s,l)}),t.options.multiple.maxLabelEntries&&(i.length>=t.options.multiple.maxLabelEntries+1?(i=i.slice(0,t.options.multiple.maxLabelEntries),i.push(e.isFunction(s)?s({text:"..."}):t.utils.format(s,{text:"..."}))):i.slice(i.length-1)),t.elements.label.html(i.join(t.options.multiple.separator))}else{var n=t.lookupItems[t.state.currValue];t.elements.label.html(e.isFunction(s)?s(n):t.utils.format(s,n))}},populate:function(){var t=this,s=t.$element.children(),l=t.$element.find("option"),i=l.filter(":selected"),n=l.index(i),a=0,o=t.state.multiple?[]:0;i.length>1&&t.state.multiple&&(n=[],i.each(function(){n.push(e(this).index())})),t.state.currValue=~n?n:o,t.state.selectedIdx=t.state.currValue,t.state.highlightedIdx=t.state.currValue,t.items=[],t.lookupItems=[],s.length&&(s.each(function(s){var l=e(this);if(l.is("optgroup")){var i={element:l,label:l.prop("label"),groupDisabled:l.prop("disabled"),items:[]};l.children().each(function(s){var l=e(this);i.items[s]=t.getItemData(a,l,i.groupDisabled||l.prop("disabled")),t.lookupItems[a]=i.items[s],a++}),t.items[s]=i}else t.items[s]=t.getItemData(a,l,l.prop("disabled")),t.lookupItems[a]=t.items[s],a++}),t.setLabel(),t.elements.items.append(t.elements.itemsScroll.html(t.getItemsMarkup(t.items))))},getItemData:function(t,s,l){var i=this;return{index:t,element:s,value:s.val(),className:s.prop("class"),text:s.html(),slug:e.trim(i.utils.replaceDiacritics(s.html())),alt:s.attr("data-alt"),selected:s.prop("selected"),disabled:l}},getItemsMarkup:function(t){var s=this,l="<ul>";return e.isFunction(s.options.listBuilder)&&s.options.listBuilder&&(t=s.options.listBuilder(t)),e.each(t,function(t,i){void 0!==i.label?(l+=s.utils.format('<ul class="{1}"><li class="{2}">{3}</li>',s.utils.arrayToClassname([s.classes.group,i.groupDisabled?"disabled":"",i.element.prop("class")]),s.classes.grouplabel,i.element.prop("label")),e.each(i.items,function(e,t){l+=s.getItemMarkup(t.index,t)}),l+="</ul>"):l+=s.getItemMarkup(i.index,i)}),l+"</ul>"},getItemMarkup:function(t,s){var l=this,i=l.options.optionsItemBuilder,n={value:s.value,text:s.text,slug:s.slug,index:s.index};return l.utils.format('<li data-index="{1}" class="{2}">{3}</li>',t,l.utils.arrayToClassname([s.className,t===l.items.length-1?"last":"",s.disabled?"disabled":"",s.selected?"selected":""]),e.isFunction(i)?l.utils.format(i(s,this.$element,t),s):l.utils.format(i,n))},unbindEvents:function(){var e=this;e.elements.wrapper.add(e.$element).add(e.elements.outerWrapper).add(e.elements.input).off(".sl")},bindEvents:function(){var t=this;t.elements.outerWrapper.on("mouseenter.sl mouseleave.sl",function(s){e(this).toggleClass(t.classes.hover,"mouseenter"===s.type),t.options.openOnHover&&(clearTimeout(t.closeTimer),"mouseleave"===s.type?t.closeTimer=setTimeout(e.proxy(t.close,t),t.options.hoverIntentTimeout):t.open())}),t.elements.wrapper.on("click.sl",function(e){t.state.opened?t.close():t.open(e)}),t.options.nativeOnMobile&&t.utils.isMobile()||(t.$element.on("focus.sl",function(){t.elements.input.focus()}),t.elements.input.prop({tabindex:t.originalTabindex,disabled:!1}).on("keydown.sl",e.proxy(t.handleKeys,t)).on("focusin.sl",function(e){t.elements.outerWrapper.addClass(t.classes.focus),t.elements.input.one("blur",function(){t.elements.input.blur()}),t.options.openOnFocus&&!t.state.opened&&t.open(e)}).on("focusout.sl",function(){t.elements.outerWrapper.removeClass(t.classes.focus)}).on("input propertychange",function(){var s=t.elements.input.val(),l=new RegExp("^"+t.utils.escapeRegExp(s),"i");clearTimeout(t.resetStr),t.resetStr=setTimeout(function(){t.elements.input.val("")},t.options.keySearchTimeout),s.length&&e.each(t.items,function(e,s){if(!s.disabled){if(l.test(s.text)||l.test(s.slug))return void t.highlight(e);if(s.alt)for(var i=s.alt.split("|"),n=0;n<i.length&&i[n];n++)if(l.test(i[n].trim()))return void t.highlight(e)}})})),t.$li.on({mousedown:function(e){e.preventDefault(),e.stopPropagation()},click:function(){return t.select(e(this).data("index")),!1}})},handleKeys:function(t){var s=this,l=t.which,i=s.options.keys,n=e.inArray(l,i.previous)>-1,a=e.inArray(l,i.next)>-1,o=e.inArray(l,i.select)>-1,r=e.inArray(l,i.open)>-1,u=s.state.highlightedIdx,p=n&&0===u||a&&u+1===s.items.length,c=0;if(13!==l&&32!==l||t.preventDefault(),n||a){if(!s.options.allowWrap&&p)return;n&&(c=s.utils.previousEnabledItem(s.lookupItems,u)),a&&(c=s.utils.nextEnabledItem(s.lookupItems,u)),s.highlight(c)}if(o&&s.state.opened)return s.select(u),void(s.state.multiple&&s.options.multiple.keepMenuOpen||s.close());r&&!s.state.opened&&s.open()},refresh:function(){var e=this;e.populate(),e.activate(),e.utils.triggerCallback("Refresh",e)},setOptionsDimensions:function(){var e=this,t=e.elements.items.closest(":visible").children(":hidden").addClass(e.classes.tempshow),s=e.options.maxHeight,l=e.elements.items.outerWidth(),i=e.elements.wrapper.outerWidth()-(l-e.elements.items.width());!e.options.expandToItemText||i>l?e.finalWidth=i:(e.elements.items.css("overflow","scroll"),e.elements.outerWrapper.width(9e4),e.finalWidth=e.elements.items.width(),e.elements.items.css("overflow",""),e.elements.outerWrapper.width("")),e.elements.items.width(e.finalWidth).height()>s&&e.elements.items.height(s),t.removeClass(e.classes.tempshow)},isInViewport:function(){var e=this;if(!0===e.options.forceRenderAbove)e.elements.outerWrapper.addClass(e.classes.above);else if(!0===e.options.forceRenderBelow)e.elements.outerWrapper.addClass(e.classes.below);else{var t=s.scrollTop(),l=s.height(),i=e.elements.outerWrapper.offset().top,n=e.elements.outerWrapper.outerHeight(),a=i+n+e.itemsHeight<=t+l,o=i-e.itemsHeight>t,r=!a&&o,u=!r;e.elements.outerWrapper.toggleClass(e.classes.above,r),e.elements.outerWrapper.toggleClass(e.classes.below,u)}},detectItemVisibility:function(t){var s=this,l=s.$li.filter("[data-index]");s.state.multiple&&(t=e.isArray(t)&&0===t.length?0:t,t=e.isArray(t)?Math.min.apply(Math,t):t);var i=l.eq(t).outerHeight(),n=l[t].offsetTop,a=s.elements.itemsScroll.scrollTop(),o=n+2*i;s.elements.itemsScroll.scrollTop(o>a+s.itemsHeight?o-s.itemsHeight:n-i<a?n-i:a)},open:function(s){var l=this;if(l.options.nativeOnMobile&&l.utils.isMobile())return!1;l.utils.triggerCallback("BeforeOpen",l),s&&(s.preventDefault(),l.options.stopPropagation&&s.stopPropagation()),l.state.enabled&&(l.setOptionsDimensions(),e("."+l.classes.hideselect,"."+l.classes.open).children().selectric("close"),l.state.opened=!0,l.itemsHeight=l.elements.items.outerHeight(),l.itemsInnerHeight=l.elements.items.height(),l.elements.outerWrapper.addClass(l.classes.open),l.elements.input.val(""),s&&"focusin"!==s.type&&l.elements.input.focus(),setTimeout(function(){t.on("click.sl",e.proxy(l.close,l)).on("scroll.sl",e.proxy(l.isInViewport,l))},1),l.isInViewport(),l.options.preventWindowScroll&&t.on("mousewheel.sl DOMMouseScroll.sl","."+l.classes.scroll,function(t){var s=t.originalEvent,i=e(this).scrollTop(),n=0;"detail"in s&&(n=-1*s.detail),"wheelDelta"in s&&(n=s.wheelDelta),"wheelDeltaY"in s&&(n=s.wheelDeltaY),"deltaY"in s&&(n=-1*s.deltaY),(i===this.scrollHeight-l.itemsInnerHeight&&n<0||0===i&&n>0)&&t.preventDefault()}),l.detectItemVisibility(l.state.selectedIdx),l.highlight(l.state.multiple?-1:l.state.selectedIdx),l.utils.triggerCallback("Open",l))},close:function(){var e=this;e.utils.triggerCallback("BeforeClose",e),t.off(".sl"),e.elements.outerWrapper.removeClass(e.classes.open),e.state.opened=!1,e.utils.triggerCallback("Close",e)},change:function(){var t=this;t.utils.triggerCallback("BeforeChange",t),t.state.multiple?(e.each(t.lookupItems,function(e){t.lookupItems[e].selected=!1,t.$element.find("option").prop("selected",!1)}),e.each(t.state.selectedIdx,function(e,s){t.lookupItems[s].selected=!0,t.$element.find("option").eq(s).prop("selected",!0)}),t.state.currValue=t.state.selectedIdx,t.setLabel(),t.utils.triggerCallback("Change",t)):t.state.currValue!==t.state.selectedIdx&&(t.$element.prop("selectedIndex",t.state.currValue=t.state.selectedIdx).data("value",t.lookupItems[t.state.selectedIdx].text),t.setLabel(),t.utils.triggerCallback("Change",t))},highlight:function(e){var t=this,s=t.$li.filter("[data-index]").removeClass("highlighted");t.utils.triggerCallback("BeforeHighlight",t),void 0===e||-1===e||t.lookupItems[e].disabled||(s.eq(t.state.highlightedIdx=e).addClass("highlighted"),t.detectItemVisibility(e),t.utils.triggerCallback("Highlight",t))},select:function(t){var s=this,l=s.$li.filter("[data-index]");if(s.utils.triggerCallback("BeforeSelect",s,t),void 0!==t&&-1!==t&&!s.lookupItems[t].disabled){if(s.state.multiple){s.state.selectedIdx=e.isArray(s.state.selectedIdx)?s.state.selectedIdx:[s.state.selectedIdx];var i=e.inArray(t,s.state.selectedIdx);-1!==i?s.state.selectedIdx.splice(i,1):s.state.selectedIdx.push(t),l.removeClass("selected").filter(function(t){return-1!==e.inArray(t,s.state.selectedIdx)}).addClass("selected")}else l.removeClass("selected").eq(s.state.selectedIdx=t).addClass("selected");s.state.multiple&&s.options.multiple.keepMenuOpen||s.close(),s.change(),s.utils.triggerCallback("Select",s,t)}},destroy:function(e){var t=this;t.state&&t.state.enabled&&(t.elements.items.add(t.elements.wrapper).add(t.elements.input).remove(),e||t.$element.removeData("selectric").removeData("value"),t.$element.prop("tabindex",t.originalTabindex).off(".sl").off(t.eventTriggers).unwrap().unwrap(),t.state.enabled=!1)}},e.fn.selectric=function(t){return this.each(function(){var s=e.data(this,"selectric");s&&!s.disableOnMobile?"string"==typeof t&&s[t]?s[t]():s.init(t):e.data(this,"selectric",new n(this,t))})},e.fn.selectric.defaults={onChange:function(t){e(t).change()},maxHeight:300,keySearchTimeout:500,arrowButtonMarkup:'<b class="button">&#x25be;</b>',disableOnMobile:!1,nativeOnMobile:!0,openOnFocus:!0,openOnHover:!1,hoverIntentTimeout:500,expandToItemText:!1,responsive:!1,preventWindowScroll:!0,inheritOriginalWidth:!1,allowWrap:!0,forceRenderAbove:!1,forceRenderBelow:!1,stopPropagation:!0,optionsItemBuilder:"{text}",labelBuilder:"{text}",listBuilder:!1,keys:{previous:[37,38],next:[39,40],select:[9,13,27],open:[13,32,37,38,39,40],close:[9,27]},customClass:{prefix:"selectric",camelCase:!1},multiple:{separator:", ",keepMenuOpen:!0,maxLabelEntries:!1}}});
 </script>
 
 <style type="text/css">
-    /*======================================
-      Selectric
-    ======================================*/
-    .selectric-wrapper {
-        position: relative;
-        margin-bottom: 10px;
-        height: 40px;
-        cursor: pointer;
-    }
+/*======================================
+  Selectric
+======================================*/
+.selectric-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+    height: 40px;
+    cursor: pointer;
+}
 
-    .selectric-responsive {
-        width: 100%;
-    }
+.selectric-responsive {
+  width: 100%;
+}
 
-    .selectric {
-        border: 1px solid #000000;
-        background: #FFFFFF;
-        position: relative;
-        border-radius: 0px;
-    }
+.selectric {
+  border: 1px solid #000000;
+  background: #FFFFFF;
+  position: relative;
+  border-radius: 0px;
+}
 
-    .selectric .label {
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0 38px 0 10px;
-        font-size: 12px;
-        line-height: 38px;
-        color: #000000;
-        height: 38px;
-    }
+.selectric .label {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 38px 0 10px;
+  font-size: 12px;
+  line-height: 38px;
+  color: #000000;
+  height: 38px;
+}
 
-    .selectric .button {
-        border-radius: 0px;
-        display: block;
-        position: absolute;
-        right: 0px;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-        width: 32px;
-        height: 32px;
-        color: #444444;
-        text-align: center;
-        font: 0/0 a;
-        *font: 32px/32px Lucida Sans Unicode, Arial Unicode MS, Arial;
-    }
+.selectric .button {
+  border-radius: 0px;
+  display: block;
+  position: absolute;
+  right: 0px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  width: 32px;
+  height: 32px;
+  color: #444444;
+  text-align: center;
+  font: 0/0 a;
+  *font: 32px/32px Lucida Sans Unicode, Arial Unicode MS, Arial;
+}
 
-    .selectric .button:after {
-        content: " ";
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        margin: auto;
-        width: 0;
-        height: 0;
-        border: 4px solid transparent;
-        border-top-color: #000000;
-        border-bottom: none;
-    }
+.selectric .button:after {
+  content: " ";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 0;
+  height: 0;
+  border: 4px solid transparent;
+  border-top-color: #000000;
+  border-bottom: none;
+}
 
-    .selectric-focus .selectric {
-        border-color: #000000;
-    }
+.selectric-focus .selectric {
+  border-color: #000000;
+}
 
-    .selectric-hover .selectric {
-        border-color: #000000;
-    }
+.selectric-hover .selectric {
+  border-color: #000000;
+}
 
-    .selectric-hover .selectric .button {
-        color: #000000;
-    }
+.selectric-hover .selectric .button {
+  color: #000000;
+}
 
-    .selectric-hover .selectric .button:after {
-        border-top-color: #000000;
-    }
+.selectric-hover .selectric .button:after {
+  border-top-color: #000000;
+}
 
-    .selectric-open {
-        z-index: 9999;
-    }
+.selectric-open {
+  z-index: 9999;
+}
 
-    .selectric-open .selectric {
-        border-color: #000000;
-        background: #ffffff;
-    }
+.selectric-open .selectric {
+  border-color: #000000;
+  background: #ffffff;
+}
 
-    .selectric-open .selectric-items {
-        display: block;
-    }
+.selectric-open .selectric-items {
+  display: block;
+}
 
-    .selectric-disabled {
-        filter: alpha(opacity=50);
-        opacity: 0.5;
-        cursor: default;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
+.selectric-disabled {
+  filter: alpha(opacity=50);
+  opacity: 0.5;
+  cursor: default;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
 
-    .selectric-hide-select {
-        position: relative;
-        overflow: hidden;
-        width: 0;
-        height: 0;
-    }
+.selectric-hide-select {
+  position: relative;
+  overflow: hidden;
+  width: 0;
+  height: 0;
+}
 
-    .selectric-hide-select select {
-        position: absolute;
-        left: -100%;
-    }
+.selectric-hide-select select {
+  position: absolute;
+  left: -100%;
+}
 
-    .selectric-hide-select.selectric-is-native {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: 10;
-    }
+.selectric-hide-select.selectric-is-native {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
 
-    .selectric-hide-select.selectric-is-native select {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 100%;
-        width: 100%;
-        border: none;
-        z-index: 1;
-        box-sizing: border-box;
-        opacity: 0;
-    }
+.selectric-hide-select.selectric-is-native select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  border: none;
+  z-index: 1;
+  box-sizing: border-box;
+  opacity: 0;
+}
 
-    .selectric-input {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        overflow: hidden !important;
-        clip: rect(0, 0, 0, 0) !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 1px !important;
-        height: 1px !important;
-        outline: none !important;
-        border: none !important;
-        *font: 0/0 a !important;
-        background: none !important;
-    }
+.selectric-input {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  outline: none !important;
+  border: none !important;
+  *font: 0/0 a !important;
+  background: none !important;
+}
 
-    .selectric-temp-show {
-        position: absolute !important;
-        visibility: hidden !important;
-        display: block !important;
-    }
+.selectric-temp-show {
+  position: absolute !important;
+  visibility: hidden !important;
+  display: block !important;
+}
 
-    /* Items box */
-    .selectric-items {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        background: #ffffff;
-        border-left: 1px solid #000000;
-        border-right: 1px solid #000000;
-        border-bottom: 1px solid #000000;
-        z-index: -1;
-        box-shadow: 0 0 10px -6px;
-    }
+/* Items box */
+.selectric-items {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #ffffff;
+  border-left: 1px solid #000000;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  z-index: -1;
+  box-shadow: 0 0 10px -6px;
+}
 
-    .selectric-items .selectric-scroll {
-        height: 100%;
-        overflow: auto;
-    }
+.selectric-items .selectric-scroll {
+  height: 100%;
+  overflow: auto;
+}
 
-    .selectric-above .selectric-items {
-        top: auto;
-        bottom: 100%;
-    }
+.selectric-above .selectric-items {
+  top: auto;
+  bottom: 100%;
+}
 
-    .selectric-items ul, .selectric-items li {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        font-size: 12px;
-        line-height: 20px;
-        min-height: 20px;
-    }
+.selectric-items ul, .selectric-items li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  min-height: 20px;
+}
 
-    .selectric-items li {
-        display: block;
-        padding: 8px;
-        color: #000000;
-        cursor: pointer;
-    }
+.selectric-items li {
+  display: block;
+  padding: 8px;
+  color: #000000;
+  cursor: pointer;
+}
 
-    .selectric-items li.selected {
-        color: #000000;
-    }
+.selectric-items li.selected {
+  color: #000000;
+}
 
-    .selectric-items li.highlighted {
-        color: #000000;
-    }
+.selectric-items li.highlighted {
+  color: #000000;
+}
 
-    .selectric-items li:hover {
-        background: rgba(32, 145, 193, 0.1);
-        color: #000000;
-    }
+.selectric-items li:hover {
+  background: rgba(32, 145, 193, 0.1);
+  color: #000000;
+}
 
-    .selectric-items .disabled {
-        filter: alpha(opacity=50);
-        opacity: 0.5;
-        cursor: default !important;
-        background: none !important;
-        color: #666 !important;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
+.selectric-items .disabled {
+  filter: alpha(opacity=50);
+  opacity: 0.5;
+  cursor: default !important;
+  background: none !important;
+  color: #666 !important;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
 
-    .selectric-items .selectric-group .selectric-group-label {
-        font-weight: bold;
-        padding-left: 10px;
-        cursor: default;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background: none;
-        color: #444;
-    }
+.selectric-items .selectric-group .selectric-group-label {
+  font-weight: bold;
+  padding-left: 10px;
+  cursor: default;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background: none;
+  color: #444;
+}
 
-    .selectric-items .selectric-group.disabled li {
-        filter: alpha(opacity=100);
-        opacity: 1;
-    }
+.selectric-items .selectric-group.disabled li {
+  filter: alpha(opacity=100);
+  opacity: 1;
+}
 
-    .selectric-items .selectric-group li {
-        padding-left: 25px;
-    }
+.selectric-items .selectric-group li {
+  padding-left: 25px;
+}
 </style>
+
 
 
 <style type="text/css">
@@ -546,13 +259,13 @@
         font-size: 14px;
     }
 
-    li .usage {
+    li .usage{
         color: #20C17E;
-        float: right;
+        float:right;
     }
 
-    li .usage_font_name {
-        float: left;
+    li .usage_font_name{
+        float:left;
     }
 
     .font-custom-select {
@@ -620,8 +333,8 @@
         padding-left: 20px;
     }
 
-    .usage-table-right-align .selectric-wrapper {
-        margin-bottom: 0;
+    .usage-table-right-align .selectric-wrapper{
+        margin-bottom:0;
     }
 
     .usage-table {
@@ -770,8 +483,7 @@
     <h3 style="margin-top: 100px;"> No Internet connection found!</h3>
     <img src="data:image/png;base64,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
 " alt="offline_image" style="text-align: center; margin-top: 50px;">
-    <p style="text-align: center; margin-top: 120px;">Please make sure that your computer is </br> connected to the
-        internet to use this plugin.</p>
+    <p style="text-align: center; margin-top: 120px;">Please make sure that your computer is </br> connected to the internet to use this plugin.</p>
 </div>
 
 <div id="online_mode" hidden="hidden">
@@ -780,7 +492,7 @@
     <select id="font-weights" class="font-custom-select" onchange="onFontWeightsChange()"></select>
     <select id="font-sizes" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
 
-    <hr/>
+    <hr />
     <div class="usage-table">
         <div class="usage-table-row">
             <div class="usage-table-left-align">
@@ -814,7 +526,7 @@
             </div>
         </div>
     </div>
-    <hr/>
+    <hr />
     <div class="usage-list-wrapper">
         <ul id="usage-list">
         </ul>
@@ -860,7 +572,7 @@
     }
 
     function onTextNodeClick(selectedNodeId) {
-        parent.postMessage({pluginMessage: {type: 'focus-on-selected-node', selectedNodeId}}, '*')
+        parent.postMessage({ pluginMessage: { type: 'focus-on-selected-node', selectedNodeId } }, '*')
     }
 
     function onStyleSelectorChanged() {
@@ -907,24 +619,12 @@
             }
         };
 
-        confirmButton.onclick = function () {
+        confirmButton.onclick =  function () {
             if (isCreateNewStyle) {
                 let newStyleName = document.getElementById('style-name-input-field').value;
-                parent.postMessage({
-                    pluginMessage: {
-                        type: 'create-new-style',
-                        filteredTextNodes,
-                        newStyleName
-                    }
-                }, '*')
+                parent.postMessage({pluginMessage: {type: 'create-new-style', filteredTextNodes, newStyleName}}, '*')
             } else {
-                parent.postMessage({
-                    pluginMessage: {
-                        type: 'assign-to-selected-style',
-                        filteredTextNodes,
-                        styleId
-                    }
-                }, '*')
+                parent.postMessage({pluginMessage: {type: 'assign-to-selected-style', filteredTextNodes, styleId}}, '*')
             }
             modal.style.display = "none";
         };
@@ -944,9 +644,10 @@
         filterTextNodes(selectedFont, selectedFontWeight, selectedSize)
     }
 
-    function removeOptions(selectbox) {
+    function removeOptions(selectbox){
         var i;
-        for (i = selectbox.options.length - 1; i >= 0; i--) {
+        for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+        {
             selectbox.remove(i);
         }
     }
@@ -958,15 +659,15 @@
         document.getElementById(selectorName).appendChild(option);
     }
 
-    function onFontOptionsChange() {
+    function onFontOptionsChange(){
         var selectFonts = document.getElementById("font-options");
         var selectedFont = selectFonts.options[selectFonts.selectedIndex].value;
         var selectFontWeights = document.getElementById("font-weights");
         var selectSizes = document.getElementById("font-sizes");
         var fontWeightOptions = [];
         var fontSizeOptions = [];
-        textNodes.forEach(function (node, index) {
-            if (node.fontName == selectedFont) {
+        textNodes.forEach(function(node, index){
+            if (node.fontName == selectedFont){
                 if (fontWeightOptions.indexOf(node.fontWeight) < 0) {
                     fontWeightOptions.push(node.fontWeight);
                 }
@@ -979,13 +680,11 @@
         removeOptions(selectFontWeights);
         removeOptions(selectSizes);
 
-        fontWeightOptions.sort().forEach(function (item, index) {
+        fontWeightOptions.sort().forEach(function(item, index){
             createOptionAndAddToSelector(item, item, 'font-weights');
         });
 
-        fontSizeOptions.sort(function (a, b) {
-            return a - b
-        }).forEach(function (item, index) {
+        fontSizeOptions.sort(function(a, b){return a-b}).forEach(function(item, index){
             createOptionAndAddToSelector(item, item, 'font-sizes');
         });
 
@@ -995,15 +694,15 @@
         getSelectedFontsAndSendToFilter();
     }
 
-    function onFontWeightsChange() {
+    function onFontWeightsChange(){
         var selectFonts = document.getElementById("font-options");
         var selectedFont = selectFonts.options[selectFonts.selectedIndex].value;
         var selectFontWeights = document.getElementById("font-weights");
         var selectedFontWeight = selectFontWeights.options[selectFontWeights.selectedIndex].value;
         var selectSizes = document.getElementById("font-sizes");
         var fontSizeOptions = [];
-        textNodes.forEach(function (node, index) {
-            if (node.fontName == selectedFont && node.fontWeight == selectedFontWeight) {
+        textNodes.forEach(function(node, index){
+            if (node.fontName == selectedFont && node.fontWeight == selectedFontWeight){
                 if (fontSizeOptions.indexOf(node.fontSize) < 0) {
                     fontSizeOptions.push(node.fontSize);
                 }
@@ -1012,9 +711,7 @@
 
         removeOptions(selectSizes);
 
-        fontSizeOptions.sort(function (a, b) {
-            return a - b
-        }).forEach(function (item, index) {
+        fontSizeOptions.sort(function(a, b){return a-b}).forEach(function(item, index){
             createOptionAndAddToSelector(item, item, 'font-sizes');
         });
 
@@ -1071,9 +768,9 @@
 
             // Get first selectric.
             fontOptionsSelectrict = $(".selectric-scroll").first();
-            $(fontOptionsSelectrict).find("li").each(function (index, item) {
+            $(fontOptionsSelectrict).find("li").each(function(index, item){
                 var fontName = $(item).html();
-                $(item).html('<span class="usage_font_name">' + fontName + '</span><span class="usage">' + fontNamesByUsage[fontName] + ' Uses</span>');
+                $(item).html('<span class="usage_font_name">'+ fontName + '</span><span class="usage">' + fontNamesByUsage[fontName] +' Uses</span>');
             });
 
         }
