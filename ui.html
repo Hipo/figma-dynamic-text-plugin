@@ -730,6 +730,7 @@
                 document.getElementById("error_description").innerHTML = "Please make sure that your computer is </br> connected to the internet to use this plugin."
                 return
             }
+            textNodes = msg.textNodes;
             if (textNodes == null || textNodes.length == 0) {
                 document.getElementById("error_mode").hidden = false
                 document.getElementById("error_title").innerHTML = "No text found!"
@@ -737,7 +738,6 @@
                 return
             }
             document.getElementById("online_mode").hidden = false
-            textNodes = msg.textNodes;
             fontNamesByUsage = msg.fontNamesByUsage;
             availableFontWeights = msg.availableFontWeights;
             availableFontSizes = msg.availableFontSizes;
