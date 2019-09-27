@@ -587,7 +587,7 @@
             return "We will create a New Style for all" + " " + itemCount + " " + "texts";
         } else {
             // it automatically trims, need to add spaces as separate.
-            return "All" + " " + itemCount + " " + "texts will be converted to \"" + subtext + "\" " + "text style";
+            return "All" + " " + itemCount + " " + "texts will be converted to " + subtext.bold() + " text style";
         }
     }
 
@@ -597,7 +597,7 @@
         let closeButton = document.getElementsByClassName("close")[0];
         let modalHeaderText = document.getElementById("modal-header-text");
 
-        modalHeaderText.textContent = text;
+        modalHeaderText.innerHTML = text;
 
         closeButton.onclick = function () {
             modal.style.display = "none";
