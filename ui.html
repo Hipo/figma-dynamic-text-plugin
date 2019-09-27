@@ -475,12 +475,10 @@
 <div class="table">
     <div class="table-row">
         <div class="left-align">
-            <p id="usage-text" hidden="hidden" class="usage-text"></p>
+            <p id="usage-text" class="usage-text"></p>
         </div>
         <div class="right-align">
-            <button id="run_script" class="button" onclick="onRunScriptClick()">Run Script</button>
-            <select id="style-spinner" class="style-custom-select" hidden="hidden"
-                onchange="onStyleSelectorChanged()"></select>
+            <select id="style-spinner" class="style-custom-select" onchange="onStyleSelectorChanged()"></select>
         </div>
     </div>
 </div>
@@ -559,13 +557,6 @@
 
     function onTextNodeClick(selectedNodeId) {
         parent.postMessage({ pluginMessage: { type: 'focus-on-selected-node', selectedNodeId } }, '*')
-    }
-
-    function onRunScriptClick() {
-        document.getElementById("run_script").hidden = true;
-        document.getElementById("usage-text").hidden = false;
-        document.getElementById("style-spinner").hidden = false;
-        getSelectedFontsAndSendToFilter()
     }
 
     function onStyleSelectorChanged() {
@@ -680,6 +671,7 @@
             })
 
             $(".font-custom-select").selectric();
+            getSelectedFontsAndSendToFilter()
         }
 
         function createOptionAndAddToSelector(text, value, selectorName) {
