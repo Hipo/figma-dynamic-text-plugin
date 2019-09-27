@@ -291,7 +291,7 @@
         flex-flow: row wrap;
     }
 
-    .table .button {
+    #confirm-button {
         background-color: #20C17E;
         border: none;
         color: white;
@@ -336,23 +336,24 @@
         padding-left: 40px;
     }
 
-    .table {
+    .usage-table {
         display: table;
         width: 100%;
     }
 
-    .table-row {
+    .usage-table-row {
         display: table-row;
     }
 
-    .left-align {
+    .usage-table-left-align {
         display: table-cell;
-        width: 25%;
+        width: 60%;
     }
 
-    .right-align {
+    .usage-table-right-align {
         display: table-cell;
-        text-align: right;
+        text-align: left;
+        width: 40%;
     }
 
     /* The Modal (background) */
@@ -481,12 +482,12 @@
 <select id="font-sizes" class="font-custom-select" onchange="getSelectedFontsAndSendToFilter()"></select>
 
 <hr />
-<div class="table">
-    <div class="table-row">
-        <div class="left-align">
+<div class="usage-table">
+    <div class="usage-table-row">
+        <div class="usage-table-left-align">
             <p id="usage-text" class="usage-text"></p>
         </div>
-        <div class="right-align">
+        <div class="usage-table-right-align">
             <select id="style-spinner" class="style-custom-select" onchange="onStyleSelectorChanged()"></select>
         </div>
     </div>
@@ -680,6 +681,7 @@
             })
 
             $(".font-custom-select").selectric();
+            $(".style-custom-select").selectric();
             getSelectedFontsAndSendToFilter()
 
             // Get first selectric.
