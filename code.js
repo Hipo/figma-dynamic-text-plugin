@@ -117,7 +117,19 @@ figma.ui.onmessage = msg => {
         assignToStyle(textNodeList, textStyleId);
     }
     if (msg.type === 'focus-on-selected-node') {
-        let selectedNode = [figma.getNodeById(msg.selectedNodeId)];
-        figma.viewport.scrollAndZoomIntoView(selectedNode);
+        let selectedNode = figma.getNodeById(msg.selectedNodeId);
+        let pageNode = null;
+        let node = selectedNode;
+        while ("parent" in node) {
+            if (node.parent.constructor.name == "PageNode") {
+                pageNode = node.parent;
+                break;
+            }
+            node = node.parent;
+        }
+        if (pageNode) {
+            figma.currentPage = pageNode;
+        }
+        figma.viewport.scrollAndZoomIntoView([selectedNode]);
     }
 };
